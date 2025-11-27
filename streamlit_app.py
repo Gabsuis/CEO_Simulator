@@ -180,8 +180,33 @@ with st.sidebar:
             st.session_state.message_count = 0
             st.rerun()
     with col2:
-        if st.button("📥 Export", use_container_width=True):
-            st.info("💡 Transcripts auto-save. Check local `transcripts/` folder.")
+        # Generate transcript for download
+        if st.session_state.messages:
+            transcript_lines = [
+                "=" * 60,
+                "CEO SIMULATOR - CHAT TRANSCRIPT",
+                f"Exported: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                "=" * 60,
+                ""
+            ]
+            for msg in st.session_state.messages:
+                if msg["role"] == "user":
+                    transcript_lines.append(f"You: {msg['content']}")
+                else:
+                    transcript_lines.append(f"{msg['agent']}: {msg['content']}")
+                transcript_lines.append("")
+            transcript_lines.append("=" * 60)
+            transcript_text = "\n".join(transcript_lines)
+            
+            st.download_button(
+                label="📥 Export",
+                data=transcript_text,
+                file_name=f"ceo_sim_transcript_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
+        else:
+            st.button("📥 Export", use_container_width=True, disabled=True)
     
     # Footer
     st.divider()
