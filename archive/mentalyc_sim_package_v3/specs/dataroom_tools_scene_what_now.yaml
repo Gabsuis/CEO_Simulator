@@ -1,0 +1,145 @@
+dataroom_tools_scene_what_now:
+  scene_id: "what_now_30_day_challenge"
+  description: >
+    Scene-specific Data Room tools for the first 30 days as CEO
+    ("Nobody knows you exist"). Focused on ICP clarity, Cagan risks,
+    and a concrete 30-day learning/milestone plan.
+
+  tools:
+    - id: "therapist_icp_value_canvas"
+      type: "canvas"
+      display_name: "Therapist ICP & Value Canvas"
+      template:
+        sections:
+          - id: "segment"
+            label: "Who (segment)"
+            prompt: "Name the specific therapist segment (e.g., solo private practice)."
+          - id: "context"
+            label: "Their world"
+            prompt: "Describe their practice context and note burden."
+          - id: "pains"
+            label: "Top documentation pains"
+            prompt: "List the top 3 pains related to documentation."
+          - id: "current_workaround"
+            label: "Current workaround"
+            prompt: "How do they handle notes today (EHR, templates, late nights)?"
+          - id: "our_promise"
+            label: "Our promise (30–90 days)"
+            prompt: "What specific outcome can we realistically create for them?"
+          - id: "evidence"
+            label: "Evidence we have / need"
+            prompt: "What evidence do we already have, and what do we still need to learn?"
+
+    - id: "cagan_risk_register"
+      type: "kanban_board"
+      display_name: "Cagan Risk Register"
+      template:
+        columns:
+          - id: "value_risk"
+            label: "Value"
+          - id: "usability_risk"
+            label: "Usability"
+          - id: "feasibility_risk"
+            label: "Feasibility"
+          - id: "business_viability_risk"
+            label: "Business Viability"
+        starter_cards:
+          - column_id: "value_risk"
+            title: "Therapists may not trust AI notes enough to use daily."
+          - column_id: "usability_risk"
+            title: "Copy-paste into EHR may be too painful for group practices."
+          - column_id: "feasibility_risk"
+            title: "Compliance features might not fit our current runway."
+          - column_id: "business_viability_risk"
+            title: "Pricing model might not support both solo and group practices."
+
+    - id: "learning_milestone_canvas_30d"
+      type: "canvas"
+      display_name: "30-Day Learning & Milestone Canvas"
+      template:
+        sections:
+          - id: "primary_milestone"
+            label: "Primary 30-day milestone"
+            prompt: "What must be true in 30 days for this phase to be a success?"
+          - id: "key_questions"
+            label: "Key questions (by Cagan risk)"
+            prompt: "For each risk type, what are we trying to learn?"
+          - id: "experiments"
+            label: "Experiments / actions"
+            prompt: "List 3–5 experiments or concrete actions you’ll take this month."
+          - id: "success_criteria"
+            label: "What good looks like at Day 30"
+            prompt: "How will we know this phase went well?"
+
+    - id: "decision_commitment_log"
+      type: "note"
+      display_name: "Decision & Commitment Log"
+      template:
+        structure:
+          fields:
+            - "date"
+            - "decision"
+            - "alternatives_considered"
+            - "rationale"
+            - "risks"
+            - "when_to_revisit"
+        starter_body: |
+          Use this log to capture your first real commitments as CEO.
+          For each decision, record:
+          - What you decided
+          - The options you considered
+          - Why you chose this path
+          - Risks you are accepting
+          - When you plan to revisit this decision
+
+    - id: "eisenhower_matrix_ceo_tasks"
+      type: "canvas"
+      display_name: "Eisenhower Matrix (CEO Tasks)"
+      optional: true
+      template:
+        sections:
+          - id: "urgent_important"
+            label: "Urgent & Important"
+          - id: "not_urgent_important"
+            label: "Not Urgent & Important"
+          - id: "urgent_not_important"
+            label: "Urgent & Not Important"
+          - id: "not_urgent_not_important"
+            label: "Not Urgent & Not Important"
+
+  default_creation_rules:
+    on_scene_start:
+      create_tools:
+        - "therapist_icp_value_canvas"
+        - "cagan_risk_register"
+        - "learning_milestone_canvas_30d"
+        - "decision_commitment_log"
+    optional_tools:
+      - "eisenhower_matrix_ceo_tasks"
+
+  command_shortcuts:
+    - command_id: "dataroom.open_icp_canvas"
+      patterns:
+        - "Data Room: open the therapist ICP canvas."
+        - "Sarai: set up the ICP & value canvas in the Data Room."
+      creates_or_focuses_tool: "therapist_icp_value_canvas"
+
+    - command_id: "dataroom.open_cagan_risk_board"
+      patterns:
+        - "Data Room: show me the Cagan risk register."
+        - "Data Room: bring up the risk board."
+      creates_or_focuses_tool: "cagan_risk_register"
+
+    - command_id: "dataroom.open_30d_milestone_canvas"
+      patterns:
+        - "Data Room: open the 30-day learning & milestone canvas."
+        - "Data Room: show me the 30-day milestone canvas."
+      creates_or_focuses_tool: "learning_milestone_canvas_30d"
+
+    - command_id: "dataroom.open_decision_log"
+      patterns:
+        - "Data Room: open my decision log."
+        - "Data Room: show the decision & commitment log."
+      creates_or_focuses_tool: "decision_commitment_log"
+
+---

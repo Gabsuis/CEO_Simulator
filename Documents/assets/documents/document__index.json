@@ -1,0 +1,340 @@
+{
+  "$schema": "https://insightone.sim/schema/v1/document-index",
+  "version": "1.2",
+  "last_updated": "2025-11-05",
+  "documents": [
+    {
+      "id": "document__index",
+      "title": "Document  Index",
+      "file": "assets/documents/document__index.json",
+      "type": "reference",
+      "category": "operations",
+      "summary": "Auto-indexed document file: document__index.json."
+    },
+    {
+      "id": "financial_report_12m_budget_simulation",
+      "title": "Financial Report 12M Budget Simulation",
+      "file": "assets/documents/Mentalyc_Financial_Model_vReal.xlsx",
+      "type": "financial",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Financial_Model_vReal.xlsx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Financial_Model_vReal.xlsx",
+        "markdown": "assets/markdown/financial_report_12m_budget_simulation.md",
+        "summary": "assets/summaries/financial_report_12m_budget_simulation_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_6_sprint_backlog",
+      "title": "Mentalyc 6 Sprint Backlog",
+      "file": "assets/documents/Mentalyc_6_Sprint_Backlog.xlsx",
+      "type": "financial",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_6_Sprint_Backlog.xlsx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_6_Sprint_Backlog.xlsx",
+        "markdown": "assets/markdown/mentalyc_6_sprint_backlog.md",
+        "summary": "assets/summaries/mentalyc_6_sprint_backlog_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_6_sprint_realworld_analytics",
+      "title": "Mentalyc 6 Sprint Realworld Analytics",
+      "file": "assets/documents/Mentalyc_6_Sprint_RealWorld_Analytics.xlsx",
+      "type": "financial",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_6_Sprint_RealWorld_Analytics.xlsx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_6_Sprint_RealWorld_Analytics.xlsx",
+        "markdown": "assets/markdown/mentalyc_6_sprint_realworld_analytics.md",
+        "summary": "assets/summaries/mentalyc_6_sprint_realworld_analytics_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_backlog_sprints_1_2",
+      "title": "Mentalyc Backlog Sprints 1 2",
+      "file": "assets/documents/Mentalyc_Backlog_Sprints_1_2.xlsx",
+      "type": "financial",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Backlog_Sprints_1_2.xlsx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Backlog_Sprints_1_2.xlsx",
+        "markdown": "assets/markdown/mentalyc_backlog_sprints_1_2.md",
+        "summary": "assets/summaries/mentalyc_backlog_sprints_1_2_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_definition_of_done",
+      "title": "Mentalyc Definition Of Done",
+      "file": "assets/documents/Mentalyc_Definition_of_Done.docx",
+      "type": "marketing",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Definition_of_Done.docx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Definition_of_Done.docx",
+        "markdown": "assets/markdown/mentalyc_definition_of_done.md",
+        "summary": "assets/summaries/mentalyc_definition_of_done_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_engineering_status_report_sprints_1_2",
+      "title": "Mentalyc Engineering Status Report Sprints 1 2",
+      "file": "assets/documents/Mentalyc_Engineering_Status_Report_Sprints_1_2.docx",
+      "type": "marketing",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Engineering_Status_Report_Sprints_1_2.docx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Engineering_Status_Report_Sprints_1_2.docx",
+        "markdown": "assets/markdown/mentalyc_engineering_status_report_sprints_1_2.md",
+        "summary": "assets/summaries/mentalyc_engineering_status_report_sprints_1_2_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_engineering_website_sprint_plan",
+      "title": "Mentalyc Engineering Website Sprint Plan",
+      "file": "assets/documents/Mentalyc_Engineering_Website_Sprint_Plan.xlsx",
+      "type": "financial",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Engineering_Website_Sprint_Plan.xlsx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Engineering_Website_Sprint_Plan.xlsx",
+        "markdown": "assets/markdown/mentalyc_engineering_website_sprint_plan.md",
+        "summary": "assets/summaries/mentalyc_engineering_website_sprint_plan_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_marketing_risk_memo_to_engineering",
+      "title": "Mentalyc Marketing Risk Memo To Engineering",
+      "file": "assets/documents/Mentalyc_Marketing_Risk_Memo_to_Engineering.docx",
+      "type": "marketing",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Marketing_Risk_Memo_to_Engineering.docx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Marketing_Risk_Memo_to_Engineering.docx",
+        "markdown": "assets/markdown/mentalyc_marketing_risk_memo_to_engineering.md",
+        "summary": "assets/summaries/mentalyc_marketing_risk_memo_to_engineering_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_product_backlog",
+      "title": "Mentalyc Product Backlog",
+      "file": "assets/documents/Mentalyc_Product_Backlog.docx",
+      "type": "marketing",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Product_Backlog.docx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Product_Backlog.docx",
+        "markdown": "assets/markdown/mentalyc_product_backlog.md",
+        "summary": "assets/summaries/mentalyc_product_backlog_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_product_goal",
+      "title": "Mentalyc Product Goal",
+      "file": "assets/documents/Mentalyc_Product_Goal.docx",
+      "type": "marketing",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Product_Goal.docx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Product_Goal.docx",
+        "markdown": "assets/markdown/mentalyc_product_goal.md",
+        "summary": "assets/summaries/mentalyc_product_goal_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_product_vision",
+      "title": "Mentalyc Product Vision",
+      "file": "assets/documents/Mentalyc_Product_Vision.docx",
+      "type": "marketing",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Product_Vision.docx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Product_Vision.docx",
+        "markdown": "assets/markdown/mentalyc_product_vision.md",
+        "summary": "assets/summaries/mentalyc_product_vision_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_scrum_roles",
+      "title": "Mentalyc Scrum Roles",
+      "file": "assets/documents/Mentalyc_Scrum_Roles.docx",
+      "type": "marketing",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Scrum_Roles.docx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Scrum_Roles.docx",
+        "markdown": "assets/markdown/mentalyc_scrum_roles.md",
+        "summary": "assets/summaries/mentalyc_scrum_roles_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_sprint_cadence",
+      "title": "Mentalyc Sprint Cadence",
+      "file": "assets/documents/Mentalyc_Sprint_Cadence.docx",
+      "type": "marketing",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Sprint_Cadence.docx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Sprint_Cadence.docx",
+        "markdown": "assets/markdown/mentalyc_sprint_cadence.md",
+        "summary": "assets/summaries/mentalyc_sprint_cadence_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "poc_must-have_features",
+      "title": "Poc Must-Have Features",
+      "file": "assets/documents/POC_Must-Have_Features.pdf",
+      "type": "product",
+      "category": "operations",
+      "summary": "Auto-indexed document file: POC_Must-Have_Features.pdf.",
+      "formats": {
+        "original": "assets/documents/POC_Must-Have_Features.pdf",
+        "markdown": "assets/markdown/poc_must-have_features.md",
+        "summary": "assets/summaries/poc_must-have_features_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "tech_backlog_8weeks",
+      "title": "Tech Backlog 8Weeks",
+      "file": "assets/documents/Mentalyc_Budget_to_Sprint_Map.xlsx",
+      "type": "financial",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Budget_to_Sprint_Map.xlsx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Budget_to_Sprint_Map.xlsx",
+        "markdown": "assets/markdown/tech_backlog_8weeks.md",
+        "summary": "assets/summaries/tech_backlog_8weeks_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "tech_backlog_sprint_summary",
+      "title": "Tech Backlog Sprint Summary",
+      "file": "assets/documents/Mentalyc_Engineering_Status_Report_Sprints_1_2.docx",
+      "type": "engineering",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Engineering_Status_Report_Sprints_1_2.docx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Engineering_Status_Report_Sprints_1_2.docx",
+        "markdown": "assets/markdown/tech_backlog_sprint_summary.md",
+        "summary": "assets/summaries/tech_backlog_sprint_summary_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "website_briefing",
+      "title": "Website Briefing",
+      "file": "assets/documents/website_briefing.pdf",
+      "type": "product",
+      "category": "operations",
+      "summary": "Auto-indexed document file: website_briefing.pdf.",
+      "formats": {
+        "original": "assets/documents/website_briefing.pdf",
+        "markdown": "assets/markdown/website_briefing.md",
+        "summary": "assets/summaries/website_briefing_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_marketing_sprint_plan",
+      "title": "Mentalyc Marketing Sprint Plan",
+      "file": "assets/documents/Mentalyc_Marketing_Sprint_Plan.xlsx",
+      "type": "marketing",
+      "category": "operations",
+      "summary": "Auto-indexed document file: Mentalyc_Marketing_Sprint_Plan.xlsx.",
+      "formats": {
+        "original": "assets/documents/Mentalyc_Marketing_Sprint_Plan.xlsx",
+        "markdown": "assets/markdown/mentalyc_marketing_sprint_plan.md",
+        "summary": "assets/summaries/mentalyc_marketing_sprint_plan_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "therapists",
+      "title": "Therapist Customer Personas",
+      "file": "assets/documents/therapists.yaml",
+      "type": "customer_research",
+      "category": "operations",
+      "summary": "Detailed customer personas for therapist users including Dr. Maya Hernandez (burned-out solo trauma specialist), Dr. James Chen (group practice owner), and Sarah Mitchell (community mental health therapist).",
+      "formats": {
+        "original": "assets/documents/therapists.yaml",
+        "markdown": "assets/markdown/therapists.md",
+        "summary": "assets/summaries/therapists_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "company_profile",
+      "title": "Company Profile",
+      "file": "assets/core/company_profile.yaml",
+      "type": "core",
+      "category": "company",
+      "summary": "Core company information including stage, funding, team, metrics, mission, and culture values for Mentalyc.",
+      "formats": {
+        "original": "assets/core/company_profile.yaml",
+        "markdown": "assets/core/company_profile.yaml",
+        "summary": "assets/core/company_profile.yaml"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "id": "mentalyc_9_month_product_roadmap",
+      "title": "Mentalyc 9 Month Product Roadmap",
+      "file": "assets/documents/mentalyc_9_month_product_roadmap.yaml",
+      "type": "planning",
+      "category": "operations",
+      "summary": "9-month product roadmap with sprint-by-sprint breakdown, phases, epics, and milestones for Mentalyc product development.",
+      "formats": {
+        "original": "assets/documents/mentalyc_9_month_product_roadmap.yaml",
+        "markdown": "assets/documents/mentalyc_9_month_product_roadmap.yaml",
+        "summary": "assets/documents/mentalyc_9_month_product_roadmap.yaml"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    }
+  ],
+  "meta": {
+    "index_purpose": "Auto-generated from assets/documents/ folder",
+    "default_access": [
+      "narrator",
+      "advisor",
+      "tech_cofounder",
+      "marketing_cofounder"
+    ],
+    "auto_update": true
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "$schema": "https://insightone.sim/schema/v1/document-index",
+  "version": "1.2",
+  "last_updated": "2025-11-25",
+  "documents": [
+    {
+      "id": "document__index",
+      "title": "Document  Index",
+      "file": "assets/documents/document__index.json",
+      "type": "reference",
+      "category": "Compaany Documents",
+      "summary": "Auto-indexed document file: document__index.json."
+    },
+    {
+      "id": "engineering_plan",
+      "title": "Engineering Plan",
+      "file": "assets/documents/Engineering_Plan.csv",
+      "type": "engineering",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: Engineering_Plan.csv."
+    },
+    {
+      "id": "financial_report_12m_budget_simulation",
+      "title": "Financial Report 12M Budget Simulation",
+      "file": "assets/documents/financial_report_12m_budget_simulation.xlsx",
+      "type": "financial",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: financial_report_12m_budget_simulation.xlsx."
+    },
+    {
+      "id": "mentalyc_6_sprint_backlog",
+      "title": "Mentalyc 6 Sprint Backlog",
+      "file": "assets/documents/Mentalyc_6_Sprint_Backlog.xlsx",
+      "type": "engineering",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: Mentalyc_6_Sprint_Backlog.xlsx."
+    },
+    {
+      "id": "mentalyc_6_sprint_realworld_analytics",
+      "title": "Mentalyc 6 Sprint Realworld Analytics",
+      "file": "assets/documents/Mentalyc_6_Sprint_RealWorld_Analytics.xlsx",
+      "type": "engineering",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: Mentalyc_6_Sprint_RealWorld_Analytics.xlsx."
+    },
+    {
+      "id": "mentalyc_backlog_sprints_1_2",
+      "title": "Mentalyc Backlog Sprints 1 2",
+      "file": "assets/documents/Mentalyc_Backlog_Sprints_1_2.xlsx",
+      "type": "engineering",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: Mentalyc_Backlog_Sprints_1_2.xlsx."
+    },
+    {
+      "id": "mentalyc_engineering_status_report_sprints_1_2",
+      "title": "Mentalyc Engineering Status Report Sprints 1 2",
+      "file": "assets/documents/Mentalyc_Engineering_Status_Report_Sprints_1_2.docx",
+      "type": "engineering",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: Mentalyc_Engineering_Status_Report_Sprints_1_2.docx."
+    },
+    {
+      "id": "mentalyc_engineering_website_sprint_plan",
+      "title": "Mentalyc Engineering Website Sprint Plan",
+      "file": "assets/documents/Mentalyc_Engineering_Website_Sprint_Plan.xlsx",
+      "type": "marketing",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: Mentalyc_Engineering_Website_Sprint_Plan.xlsx."
+    },
+    {
+      "id": "mentalyc_marketing_risk_memo_to_engineering",
+      "title": "Mentalyc Marketing Risk Memo To Engineering",
+      "file": "assets/documents/Mentalyc_Marketing_Risk_Memo_to_Engineering.docx",
+      "type": "marketing",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: Mentalyc_Marketing_Risk_Memo_to_Engineering.docx."
+    },
+    {
+      "id": "mentalyc_product_backlog",
+      "title": "Mentalyc Product Backlog",
+      "file": "assets/documents/Mentalyc_Product_Backlog.docx",
+      "type": "engineering",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: Mentalyc_Product_Backlog.docx."
+    },
+    {
+      "id": "mentalyc_product_goal",
+      "title": "Mentalyc Product Goal",
+      "file": "assets/documents/Mentalyc_Product_Goal.docx",
+      "type": "marketing",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: Mentalyc_Product_Goal.docx."
+    },
+    {
+      "id": "mentalyc_product_vision",
+      "title": "Mentalyc Product Vision",
+      "file": "assets/documents/Mentalyc_Product_Vision.docx",
+      "type": "marketing",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: Mentalyc_Product_Vision.docx."
+    },
+    {
+      "id": "poc_must-have_features",
+      "title": "Poc Must-Have Features",
+      "file": "assets/documents/POC_Must-Have_Features.pdf",
+      "type": "engineering",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: POC_Must-Have_Features.pdf."
+    },
+    {
+      "id": "tech_backlog_8weeks",
+      "title": "Tech Backlog 8Weeks",
+      "file": "assets/documents/tech_backlog_8weeks.xlsx",
+      "type": "engineering",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: tech_backlog_8weeks.xlsx."
+    },
+    {
+      "id": "tech_backlog_sprint_summary",
+      "title": "Tech Backlog Sprint Summary",
+      "file": "assets/documents/tech_backlog_sprint_summary.csv",
+      "type": "engineering",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: tech_backlog_sprint_summary.csv."
+    },
+    {
+      "id": "website_briefing",
+      "title": "Website Briefing",
+      "file": "assets/documents/website_briefing.pdf",
+      "type": "marketing",
+      "category": "Company Documents",
+      "summary": "Auto-indexed document file: website_briefing.pdf."
+    }
+  ],
+  "meta": {
+    "index_purpose": "Auto-generated from assets/documents/ folder",
+    "default_access": [
+      "narrator",
+      "advisor",
+      "CEO",
+      "Tech_Cofounder",
+      "Marketing_Cofounder"
+    ],
+
+}

@@ -1,0 +1,215 @@
+sarai_spec:
+  version: "1.0"
+
+  sarai_profile:
+    id: "sarai"
+    name: "Sarai"
+    in_world_title: "Advanced AI copilot / simulation orchestrator"
+    tagline: "Narrator, router, systems brain, and CEO’s meta-ally"
+    primary_user: "CEO of Mentalyc (you)"
+    voice:
+      tone: "direct, warm, reality-based"
+      avoids:
+        - "false certainty"
+        - "clinical advice to the player"
+        - "overly formal legal/financial guidance"
+
+  ui_channels:
+    - id: "meeting"
+      description: "Main in-character meeting with CEO and roles."
+    - id: "data_room"
+      description: "Shared smart workspace (docs, boards, charts, notes)."
+    - id: "sarai_panel"
+      description: "Private meta channel for CEO (and optionally Advisor)."
+
+  interaction_patterns:
+    default_speaker_logic:
+      if_no_speaker_prefix: "Sarai"
+      speaker_prefix_patterns:
+        - "{role}: {message}"
+        - "{role} -- {message}"
+    examples:
+      - "Sarai: Map my runway against the roadmap."
+      - "tech: What are our must-have HIPAA features?"
+      - "Data Room: create a burn vs cash graph."
+      - "Sarai: Evaluate me in the context of the 'What now' 30-day scene."
+
+  instruction_rules:
+    global_safety:
+      no_clinical_advice_for_player: true
+      no_self_harm_instructions: true
+      no_professional_legal_tax_medical_advice: true
+      self_harm_response:
+        action: "redirect"
+        message: >
+          I'm worried about your safety. I can't help with this in a simulation.
+          Please reach out to a trusted person or local emergency / crisis resources.
+    role_boundary_enforcement:
+      description: >
+        When speaking as a role, Sarai must respect that role's knowledge and responsibility limits.
+      examples:
+        - "Coach never references raw financial spreadsheets directly."
+        - "Therapists never reference internal sprint analytics."
+        - "VC only sees board-level summaries, not every internal document line."
+    meta_responses:
+      when_limit_reached:
+        pattern: >
+          I can’t safely or realistically help with that in this simulation. Here’s why:
+          {reason}. Here’s what you *can* explore instead: {safer_alternative}.
+
+  command_map:
+    - id: "sarai.feedback.generic"
+      ui_target: "sarai_panel"
+      patterns:
+        - "Sarai: Give me my generic CEO evaluation."
+        - "Sarai: Give me a system-level performance evaluation as CEO based on KPIs and milestones."
+        - "Sarai: How am I doing overall as CEO right now?"
+
+    - id: "sarai.scene_eval.what_now"
+      ui_target: "sarai_panel"
+      patterns:
+        - "Sarai: Evaluate me specifically for the 'What now' 30-day CEO challenge."
+        - "Sarai: How did I do in my first 30 days as CEO, according to the scene?"
+        - "Sarai: Evaluate me in the context of the 'What now' 30-day scene."
+
+    - id: "sarai.micro_360"
+      ui_target: "sarai_panel"
+      patterns:
+        - "Sarai: Ask Tech, Marketing, and Coach for a one-line review of my last decision."
+        - "Sarai: Ask {roles} for brief feedback on my last decision."
+
+    - id: "sarai.observe"
+      ui_target: "sarai_panel"
+      patterns:
+        - "Sarai: What patterns do you see in how I’ve been leading?"
+        - "Sarai: Tell me if I’m avoiding any important decisions."
+
+    - id: "sarai.summary.meeting"
+      ui_target: "sarai_panel"
+      patterns:
+        - "Sarai: Summarize what happened in this meeting so far."
+        - "Sarai: Give me a short summary of today's conversation."
+
+    - id: "sarai.summary.financials"
+      ui_target: "sarai_panel"
+      patterns:
+        - "Sarai: Summarize our financial situation."
+        - "Sarai: Summarize burn, cash, and runway."
+
+    - id: "sarai.panel.close"
+      ui_target: "sarai_panel"
+      patterns:
+        - "Sarai: Close for now."
+        - "Sarai: Hide your panel."
+
+    - id: "sarai.dataroom.create_graph_burn_cash"
+      ui_target: "data_room"
+      patterns:
+        - "Sarai: Create a burn vs cash graph in the Data Room."
+        - "Sarai: Put a burn vs cash chart on the screen."
+
+    - id: "sarai.dataroom.open_icp_canvas"
+      ui_target: "data_room"
+      patterns:
+        - "Sarai: Open the therapist ICP & value canvas."
+        - "Sarai: Set up the ICP canvas in the Data Room."
+
+  intent_map:
+    sarai.feedback.generic:
+      handler: "ceo_evaluation.run_generic"
+      uses:
+        - "ceo_role.internal_behavioral_engine"
+        - "ceo_role.evaluation_model.system_kpi_scorecard"
+
+    sarai.scene_eval.what_now:
+      handler: "scene_evaluation.run_what_now"
+      uses:
+        - "scene_what_now.scene_evaluation"
+        - "ceo_role.internal_behavioral_engine"
+
+    sarai.micro_360:
+      handler: "ceo_evaluation.run_micro_360"
+      uses:
+        - "ceo_role.evaluation_model.role_360_feedback"
+        - "meeting_state.last_decision"
+
+    sarai.observe:
+      handler: "ceo_evaluation.run_observations"
+      uses:
+        - "ceo_role.internal_behavioral_engine"
+        - "meeting_state.prompt_history"
+
+    sarai.summary.meeting:
+      handler: "summaries.meeting"
+      uses:
+        - "meeting_state.transcript"
+
+    sarai.summary.financials:
+      handler: "summaries.financials"
+      uses:
+        - "financial_model"
+        - "ceo_role.kpi_framework"
+
+    sarai.panel.close:
+      handler: "ui.sarai_panel.close"
+      uses: []
+
+    sarai.dataroom.create_graph_burn_cash:
+      handler: "dataroom.create_graph_from_financials"
+      uses:
+        - "dataroom_spec.artifact_types.graph"
+        - "financial_model"
+
+    sarai.dataroom.open_icp_canvas:
+      handler: "dataroom.ensure_tool_visible"
+      uses:
+        - "dataroom_tools_scene_what_now.tools.therapist_icp_value_canvas"
+
+  evaluation_hooks:
+    generic_ceo:
+      ceo_spec: "specs/ceo_role.yaml"
+      axes:
+        - "situational_awareness"
+        - "strategic_focus"
+        - "financial_discipline"
+        - "stakeholder_alignment"
+        - "decision_vs_analysis"
+    scenes:
+      - scene_id: "what_now_30_day_challenge"
+        scene_spec: "specs/scene_what_now.yaml"
+        mode: "first_30_days"
+
+  data_layer:
+    objects:
+      - id: "meeting_state"
+        fields: ["participants", "transcript", "last_decision", "prompt_history"]
+      - id: "ceo_state"
+        fields: ["prompt_history", "unlocked_documents", "commitments"]
+      - id: "data_room_state"
+        fields: ["artifacts", "focus_artifact_id"]
+      - id: "financial_model"
+        fields: ["monthly_burn", "cash_balance", "runway_months"]
+      - id: "document_index"
+        fields: ["documents", "paths", "roles_with_access"]
+    permissions:
+      sarai:
+        can_read: ["*"]
+        can_write:
+          - "sarai_panel_state"
+          - "data_room_state"
+      roles:
+        inherit_from: "role_specs"
+
+  documents:
+    index_file: "insightone/assets/documents/document__index.json"
+
+  links:
+    ceo_spec: "specs/ceo_role.yaml"
+    scene_specs:
+      - "specs/scene_what_now.yaml"
+    dataroom_spec: "specs/dataroom_spec.yaml"
+    dataroom_tools:
+      - "specs/dataroom_tools_scene_what_now.yaml"
+    safety_rules: "specs/safety_rules.yaml"
+
+---

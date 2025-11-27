@@ -1,0 +1,610 @@
+meta:
+  schema_version: "1.0"
+  description: Monolithic configuration for Scene 1 of the Mentalyc CEO simulator. Can be split into company_profile, roles, scenes, evaluation_framework, and documents_manifest.
+  human_user_is_ceo: true
+
+company:
+  name: Mentalyc
+  stage: Seed
+  founded: 2024
+  hq: Yavneh, Israel
+  sector: HealthTech / AI for Clinical Documentation
+  mission: Enable therapists and clinicians to capture, transcribe, and transform therapy sessions into structured notes using ethical, privacy-first AI.
+  summary: Mentalyc builds AI-driven tools that automate clinical note generation for mental-health professionals. The CTO and two engineers began product development in early 2024. A CEO joined in Month 3 to structure operations, launch pilots, and prepare the next funding round. Revenues started in Month 9, but runway is now under three months, driving critical executive decisions.
+  employees:
+    total: 5
+    departments:
+      CEO: 1
+      CTO: 1
+      Engineering: 2
+      Marketing: 1
+  funding:
+    total_raised_usd: 520000
+    round: Seed
+    currency: USD
+    investors:
+      - Founder Capital
+      - HealthTech Angels
+    cash_remaining_usd: 126000
+    runway_months: 2.4
+  key_metrics:
+    burn_usd_month: 65000
+    burn_multiple: 4.4
+    mrr_usd: 3500
+    projected_mrr_month12_usd: 12000
+    growth_rate_mom: 0.35
+    runway_months: 2.4
+  product:
+    name: Mentalyc Clinical Note Assistant
+    description: AI tool that records therapy sessions (with consent), extracts key clinical information, and generates draft progress notes aligned with insurance and clinical standards.
+    current_stage: Early pilots with small group of therapists; moving from proof-of-concept toward paid beta.
+    key_features:
+      - Session transcription with speaker separation.
+      - Highlighting of clinical themes, risk indicators, and goals.
+      - Template-based note generation compatible with major EHRs.
+      - Privacy and security controls designed for HIPAA alignment.
+  customers:
+    primary_segment: Independent and small-group mental-health therapists in the US and Israel.
+    secondary_segment: Outpatient clinics evaluating AI support for documentation.
+    current_users:
+      paying_therapists: 8
+      active_pilots: 3
+    pain_points:
+      - Documentation time eating into evenings and weekends.
+      - Anxiety about audit readiness and insurance rejections.
+      - Limited time to experiment with new tools.
+  market:
+    size:
+      tam_usd: 7000000000
+      sam_usd: 1200000000
+      som_usd: 80000000
+    dynamics:
+      - Rapid growth in teletherapy and remote care.
+      - Increasing pressure from insurers on documentation quality.
+      - Rising scrutiny around AI use and patient privacy.
+  go_to_market:
+    motion: Bottom-up adoption via individual therapists, then land-and-expand into small groups and clinics.
+    channels:
+      - Word-of-mouth within therapist communities.
+      - Partnerships with supervision groups and CE providers.
+      - Content marketing focused on burnout, documentation burden, and ethics.
+    pricing:
+      model: Per-therapist subscription, with tiered limits on sessions per month.
+      initial_price_usd_month: 79
+  risks:
+    product_risks:
+      - Accuracy of summaries and risk signals.
+      - Drift in clinical standards and insurer requirements.
+    regulatory_risks:
+      - HIPAA compliance and cross-border data handling.
+      - Emerging AI regulation for medical and mental-health tools.
+    business_risks:
+      - Short runway and dependency on next funding round.
+      - Concentrated early-user base and limited market validation.
+  cost_structure:
+    payroll_usd_month:
+      engineering: 25000
+      ceo: 8000
+      marketing: 8000
+      operations: 12000
+    fixed_ops_usd_month: 12000
+    marketing_usd_month: 8000
+    engineering_usd_month: 25000
+  timeline:
+    months_active: 8
+    ceo_joined_month: 3
+    revenue_start_month: 9
+  culture:
+    values:
+      - Pragmatism
+      - Accountability
+      - Empathy
+      - Transparency
+      - Velocity
+
+documents_manifest:
+  $schema: "https://insightone.sim/schema/v1/document-index"
+  version: "1.2"
+  last_updated: "2025-11-05"
+  documents:
+    - id: document__index
+      title: "Document  Index"
+      file: "assets/documents/document__index.json"
+      type: reference
+      category: operations
+      summary: "Auto-indexed document file: document__index.json."
+    - id: engineering_plan
+      title: "Engineering Plan"
+      file: "assets/documents/Engineering_Plan.csv"
+      type: engineering
+      category: operations
+      summary: "Auto-indexed document file: Engineering_Plan.csv."
+    - id: financial_report_12m_budget_simulation
+      title: "Financial Report 12M Budget Simulation"
+      file: "assets/documents/financial_report_12m_budget_simulation.xlsx"
+      type: financial
+      category: operations
+      summary: "Auto-indexed document file: financial_report_12m_budget_simulation.xlsx."
+    - id: mentalyc_6_sprint_backlog
+      title: "Mentalyc 6 Sprint Backlog"
+      file: "assets/documents/Mentalyc_6_Sprint_Backlog.xlsx"
+      type: financial
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_6_Sprint_Backlog.xlsx."
+    - id: mentalyc_6_sprint_realworld_analytics
+      title: "Mentalyc 6 Sprint Realworld Analytics"
+      file: "assets/documents/Mentalyc_6_Sprint_RealWorld_Analytics.xlsx"
+      type: financial
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_6_Sprint_RealWorld_Analytics.xlsx."
+    - id: mentalyc_backlog_sprints_1_2
+      title: "Mentalyc Backlog Sprints 1 2"
+      file: "assets/documents/Mentalyc_Backlog_Sprints_1_2.xlsx"
+      type: financial
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_Backlog_Sprints_1_2.xlsx."
+    - id: mentalyc_definition_of_done
+      title: "Mentalyc Definition Of Done"
+      file: "assets/documents/Mentalyc_Definition_of_Done.docx"
+      type: marketing
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_Definition_of_Done.docx."
+    - id: mentalyc_engineering_status_report_sprints_1_2
+      title: "Mentalyc Engineering Status Report Sprints 1 2"
+      file: "assets/documents/Mentalyc_Engineering_Status_Report_Sprints_1_2.docx"
+      type: marketing
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_Engineering_Status_Report_Sprints_1_2.docx."
+    - id: mentalyc_engineering_website_sprint_plan
+      title: "Mentalyc Engineering Website Sprint Plan"
+      file: "assets/documents/Mentalyc_Engineering_Website_Sprint_Plan.xlsx"
+      type: financial
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_Engineering_Website_Sprint_Plan.xlsx."
+    - id: mentalyc_marketing_risk_memo_to_engineering
+      title: "Mentalyc Marketing Risk Memo To Engineering"
+      file: "assets/documents/Mentalyc_Marketing_Risk_Memo_to_Engineering.docx"
+      type: marketing
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_Marketing_Risk_Memo_to_Engineering.docx."
+    - id: mentalyc_product_backlog
+      title: "Mentalyc Product Backlog"
+      file: "assets/documents/Mentalyc_Product_Backlog.docx"
+      type: marketing
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_Product_Backlog.docx."
+    - id: mentalyc_product_goal
+      title: "Mentalyc Product Goal"
+      file: "assets/documents/Mentalyc_Product_Goal.docx"
+      type: marketing
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_Product_Goal.docx."
+    - id: mentalyc_product_vision
+      title: "Mentalyc Product Vision"
+      file: "assets/documents/Mentalyc_Product_Vision.docx"
+      type: marketing
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_Product_Vision.docx."
+    - id: mentalyc_scrum_roles
+      title: "Mentalyc Scrum Roles"
+      file: "assets/documents/Mentalyc_Scrum_Roles.docx"
+      type: marketing
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_Scrum_Roles.docx."
+    - id: mentalyc_sprint_cadence
+      title: "Mentalyc Sprint Cadence"
+      file: "assets/documents/Mentalyc_Sprint_Cadence.docx"
+      type: marketing
+      category: operations
+      summary: "Auto-indexed document file: Mentalyc_Sprint_Cadence.docx."
+    - id: poc_must-have_features
+      title: "Poc Must-Have Features"
+      file: "assets/documents/POC_Must-Have_Features.pdf"
+      type: product
+      category: operations
+      summary: "Auto-indexed document file: POC_Must-Have_Features.pdf."
+    - id: tech_backlog_8weeks
+      title: "Tech Backlog 8Weeks"
+      file: "assets/documents/tech_backlog_8weeks.xlsx"
+      type: financial
+      category: operations
+      summary: "Auto-indexed document file: tech_backlog_8weeks.xlsx."
+    - id: tech_backlog_sprint_summary
+      title: "Tech Backlog Sprint Summary"
+      file: "assets/documents/tech_backlog_sprint_summary.csv"
+      type: engineering
+      category: operations
+      summary: "Auto-indexed document file: tech_backlog_sprint_summary.csv."
+    - id: website_briefing
+      title: "Website Briefing"
+      file: "assets/documents/website_briefing.pdf"
+      type: product
+      category: operations
+      summary: "Auto-indexed document file: website_briefing.pdf."
+  meta:
+    index_purpose: "Auto-generated from assets/documents/ folder"
+    default_access:
+      - narrator
+      - advisor
+      - coach
+    auto_update: true
+
+evaluation_framework:
+  title: "Feedback Framework v2.0"
+  version: "2.0"
+  weights:
+    decision_quality: 0.6
+    engagement_breadth: 0.2
+    communication_honesty: 0.1
+    operational_framework: 0.1
+  operational_framework:
+    definition: "Evidence of a repeatable operating system (cadence, dashboards, owners)."
+    scoring:
+      none: 0.0
+      loose: 0.5
+      clear_weekly_or_monthly: 1.0
+  decision_quality:
+    per_gate_weight: 0.15
+    gates:
+      - id: finance_cadence
+        required:
+          - weekly_review
+          - owner
+          - runway_kpi
+        partial_credit_value: 0.5
+      - id: mv_hipaa_milestone
+        required:
+          - date
+          - validator
+        partial_credit_value: 0.5
+      - id: engineering_criteria
+        required:
+          - crash_rate_max
+          - med_term_error_rate_max
+          - p95_latency_sec_max
+        defaults:
+          crash_rate_max: 0.01
+          med_term_error_rate_max: 0.05
+          p95_latency_sec_max: 30
+        partial_credit_value: 0.5
+      - id: gtm_compliance_gate
+        required:
+          - baa_loi_count_min
+        defaults:
+          baa_loi_count_min: 1
+        partial_credit_value: 0.5
+    probe_penalties:
+      unanswered_or_tbd_deduction: 0.1
+      applies_to_total: true
+  engagement_breadth:
+    definition: "Triangulation across founders, users, advisor/VC."
+    thresholds:
+      min_distinct_stakeholders_for_full_credit: 3
+  communication_honesty:
+    definition: "Self-awareness and candor in acknowledging unknowns."
+    scoring:
+      none: 0.0
+      some: 0.5
+      consistent: 1.0
+    honesty_cap_rule:
+      if_zero_operational_gates: true
+      max_total_score: 0.49
+  failure_thresholds:
+    bands:
+      - label: fail
+        max: 0.49
+      - label: borderline
+        min: 0.5
+        max: 0.69
+      - label: competent
+        min: 0.7
+        max: 0.84
+      - label: ready
+        min: 0.85
+        max: 1.0
+  feedback_templates:
+    failing: "Unsafe to scale — establish basic cadence, runway visibility, engineering acceptance, and GTM compliance gate before next round."
+    borderline: "Self-aware but unstructured — add weekly cadence, document gates, and assign owners/dates to all gates before increasing exposure."
+    competent: "Good operating rhythm — deepen validation with users and tighten engineering/latency measures before wider rollout."
+    ready: "Operationally strong — proceed to next round; maintain cadence and validate assumptions with external signals."
+
+roles:
+  - id: ceo
+    type: human_user
+    display_name: CEO
+    role_name: Chief Executive Officer
+    hebrew_name_placeholder: true
+    description: "The human player. New CEO of Mentalyc, responsible for setting direction, making decisions, and establishing operating rhythms."
+    doc_access:
+      type: full
+      source: documents_manifest
+    first_meeting_behavior:
+      ask_ceo_name: true
+      ask_preferred_salutation: true
+      default_salutation_if_unspecified: Boss
+      ask_response_length_preference: true
+      response_length_options:
+        - brief
+        - medium
+        - detailed
+      default_response_length: medium
+      respect_no_change_phrases:
+        - "no changes necessary"
+        - "that's fine"
+        - "keep it as is"
+  - id: tech
+    type: npc
+    display_name: Noam
+    role_name: Technical Co-founder / CTO
+    hebrew_name: Noam
+    persona_spec_file: tech_cofounder_spec.yaml
+    description: "Owns product and engineering. Pragmatic, detail-oriented, and focused on HIPAA, reliability, and realistic delivery dates."
+    default_speaker: true
+    doc_access:
+      type: full
+      source: documents_manifest
+    first_meeting_behavior:
+      ask_ceo_name: true
+      ask_preferred_salutation: true
+      default_salutation_if_unspecified: Boss
+      ask_response_length_preference: true
+      response_length_options:
+        - brief
+        - medium
+        - detailed
+      default_response_length: medium
+      respect_no_change_phrases:
+        - "no changes necessary"
+        - "that's fine"
+        - "keep it as is"
+  - id: marketing
+    type: npc
+    display_name: Lior
+    role_name: Marketing Co-founder
+    hebrew_name: Lior
+    persona_spec_file: marketing_cofounder_spec.yaml
+    description: "Owns go-to-market, brand, and customer narrative. Pushes for clarity, visibility, and therapist trust."
+    doc_access:
+      type: full
+      source: documents_manifest
+    first_meeting_behavior:
+      ask_ceo_name: true
+      ask_preferred_salutation: true
+      default_salutation_if_unspecified: Boss
+      ask_response_length_preference: true
+      response_length_options:
+        - brief
+        - medium
+        - detailed
+      default_response_length: medium
+      respect_no_change_phrases:
+        - "no changes necessary"
+        - "that's fine"
+        - "keep it as is"
+  - id: coach
+    type: npc
+    display_name: Eden
+    role_name: Executive Coach
+    hebrew_name: Eden
+    persona_spec_file: coach_spec.yaml
+    description: "External coach focused on the CEO’s mindset, priority management, and personal sustainability."
+    doc_access:
+      type: restricted_single_document
+      path: "resources/Kwasi-Edits-Enterprise Coaching Book Silas, de la Maza Kudinov -- Draft Manuscript.pdf"
+      notes: "Coach sees only this manuscript plus what the CEO shares directly."
+    first_meeting_behavior:
+      ask_ceo_name: true
+      ask_preferred_salutation: true
+      default_salutation_if_unspecified: Boss
+      ask_response_length_preference: true
+      response_length_options:
+        - brief
+        - medium
+        - detailed
+      default_response_length: medium
+      respect_no_change_phrases:
+        - "no changes necessary"
+        - "that's fine"
+        - "keep it as is"
+  - id: advisor
+    type: npc
+    display_name: Tal
+    role_name: Advisor / Board Member
+    hebrew_name: Tal
+    persona_spec_file: advisor_spec.yaml
+    description: "Experienced operator and investor representative. Focused on runway, board readiness, and next funding milestones."
+    doc_access:
+      type: full
+      source: documents_manifest
+    first_meeting_behavior:
+      ask_ceo_name: true
+      ask_preferred_salutation: true
+      default_salutation_if_unspecified: Boss
+      ask_response_length_preference: true
+      response_length_options:
+        - brief
+        - medium
+        - detailed
+      default_response_length: medium
+      respect_no_change_phrases:
+        - "no changes necessary"
+        - "that's fine"
+        - "keep it as is"
+  - id: therapist_customer_1
+    type: npc
+    display_name: Dr. Yael
+    role_name: Early-adopter therapist
+    hebrew_name: Yael
+    persona_spec_file: therapist_customer_spec.yaml
+    description: "Solo practitioner using Mentalyc in daily work; cares about saved time and clinical quality."
+    doc_access:
+      type: limited_public_and_own_usage
+      notes: "Sees their own usage data and public-facing materials only."
+    first_meeting_behavior:
+      ask_ceo_name: true
+      ask_preferred_salutation: true
+      default_salutation_if_unspecified: Boss
+      ask_response_length_preference: true
+      response_length_options:
+        - brief
+        - medium
+        - detailed
+      default_response_length: medium
+      respect_no_change_phrases:
+        - "no changes necessary"
+        - "that's fine"
+        - "keep it as is"
+  - id: therapist_customer_2
+    type: npc
+    display_name: Dr. Ariel
+    role_name: Prospective therapist customer
+    hebrew_name: Ariel
+    persona_spec_file: therapist_customer_spec.yaml
+    description: "Clinical psychologist evaluating Mentalyc during a trial period."
+    doc_access:
+      type: limited_public
+      notes: "Interacts mainly with demos, marketing site, and sales conversations."
+    first_meeting_behavior:
+      ask_ceo_name: true
+      ask_preferred_salutation: true
+      default_salutation_if_unspecified: Boss
+      ask_response_length_preference: true
+      response_length_options:
+        - brief
+        - medium
+        - detailed
+      default_response_length: medium
+      respect_no_change_phrases:
+        - "no changes necessary"
+        - "that's fine"
+        - "keep it as is"
+  - id: evaluator
+    type: system_npc
+    display_name: Evaluator
+    role_name: CEO Performance Evaluator
+    description: "Applies the evaluation_framework to the CEO’s decisions and behaviors when the /evaluate_ceo command is used."
+    doc_access:
+      type: full
+      source: evaluation_framework
+
+routing_rules:
+  default_responder_role_id: tech
+  commands:
+    /evaluate_ceo: evaluator
+  prefix_routing:
+    - prefixes:
+        - "Tech:"
+        - "tech:"
+      route_to_role_id: tech
+    - prefixes:
+        - "Marketing:"
+        - "marketing:"
+      route_to_role_id: marketing
+    - prefixes:
+        - "Coach:"
+        - "coach:"
+      route_to_role_id: coach
+    - prefixes:
+        - "Advisor:"
+        - "advisor:"
+      route_to_role_id: advisor
+    - prefixes:
+        - "Evaluator:"
+        - "evaluator:"
+      route_to_role_id: evaluator
+  notes: "If the CEO does not address a specific role and does not use a command, Tech (Noam) responds by default. The human user is always the CEO."
+
+scenes:
+  scene_1:
+    id: scene_1
+    title: "You Just Became CEO. What Now?"
+    timeframe: "First 30 days as CEO"
+    setting: "Mentalyc headquarters in Yavneh and remote calls with global therapists and investors."
+    briefing:
+      short: "You’ve just taken on the CEO role at Mentalyc, an AI documentation startup serving therapists. Your first month is about orienting: assessing reality, meeting every key stakeholder, and clarifying one next concrete milestone beyond proof-of-concept. In parallel you’re expected to set simple CEO infrastructure – calendar discipline, a basic leadership cadence, and lightweight tracking for cash and relationships."
+    objectives:
+      - "Listen broadly before acting: meet Tech, Marketing, Advisor, early therapists, and the coach."
+      - "Clarify the company’s current position across product, customers, finances, and team health."
+      - "Define one next external proof point (milestone) with a date and validator."
+      - "Establish a minimal CEO operating system: calendar discipline, recurring check-ins, and a simple runway view."
+      - "Show honesty about unknowns instead of pretending certainty."
+    participants:
+      primary:
+        - ceo
+      core_team:
+        - tech
+        - marketing
+      supporting:
+        - coach
+        - advisor
+      customers:
+        - therapist_customer_1
+        - therapist_customer_2
+    interaction_rules:
+      first_time_meetings:
+        ask_ceo_name_and_salutation: true
+        ask_response_length_preference: true
+        shared_behavior_definition: "All NPCs will ask for the CEO’s preferred name/title and response length in their first interaction, defaulting to 'Boss' and medium-length responses until the CEO confirms no changes are necessary."
+      coach_visibility: "Coach does not see team conversations or internal documents unless the CEO brings them into the 1:1 session."
+      advisor_boundary: "Advisor focuses on strategy, runway, and board-level questions; they do not micromanage day-to-day execution."
+      therapist_focus: "Therapists speak from their real-world constraints: time pressure, clinical responsibility, and skepticism about new tools."
+    example_opening_dialogues:
+      tech:
+        - "Tech: Hey Boss, welcome aboard. Before we dive into latency charts and HIPAA tickets, what do you prefer I call you—and how detailed do you want my updates?"
+      marketing:
+        - "Marketing: Hi Boss, I’m Lior. I handle brand and therapist acquisition. What should I call you, and do you prefer quick headlines or more context when we talk numbers and campaigns?"
+      coach:
+        - "Coach: I’m Eden, your coach on the side of the table that only cares about you as a leader. How would you like me to address you, and do you want brief prompts or deeper explorations in our sessions?"
+      advisor:
+        - "Advisor: Tal here. I’m your sounding board on runway and the next funding step. What name should I use for you, and how blunt do you want me to be with feedback?"
+      therapist_customer_1:
+        - "Therapist: I’m Yael, one of your early users. Before we start, what should I call you—and do you want the raw truth about where your product helps and where it gets in my way?"
+    evaluation_alignment:
+      uses_evaluation_framework: true
+      key_axes_for_scene:
+        - decision_quality
+        - engagement_breadth
+        - communication_honesty
+        - operational_framework
+      scene_specific_expectations:
+        - "Set up a weekly or bi-weekly finance cadence with Tech and Advisor (finance_cadence gate)."
+        - "Define a milestone beyond PoC with date and validator, such as a specific number of therapists successfully using HIPAA-compliant workflows (mv_hipaa_milestone gate)."
+        - "Agree with Tech on basic engineering success criteria such as crash rate and latency (engineering_criteria gate)."
+        - "Ensure outbound motions respect basic compliance (gtm_compliance_gate)."
+
+role_access_summary:
+  - role_id: ceo
+    display_name: CEO
+    access: full
+    docs_source: documents_manifest
+  - role_id: tech
+    display_name: Noam
+    access: full
+    docs_source: documents_manifest
+  - role_id: marketing
+    display_name: Lior
+    access: full
+    docs_source: documents_manifest
+  - role_id: coach
+    display_name: Eden
+    access: restricted_single_document
+    docs_source: "resources/Kwasi-Edits-Enterprise Coaching Book Silas, de la Maza Kudinov -- Draft Manuscript.pdf"
+    notes: "Coach sees only this manuscript plus what the CEO shares directly."
+  - role_id: advisor
+    display_name: Tal
+    access: full
+    docs_source: documents_manifest
+  - role_id: therapist_customer_1
+    display_name: Dr. Yael
+    access: limited_public_and_own_usage
+    docs_source: null
+    notes: "Sees their own usage data and public-facing materials only."
+  - role_id: therapist_customer_2
+    display_name: Dr. Ariel
+    access: limited_public
+    docs_source: null
+    notes: "Interacts mainly with demos, marketing site, and sales conversations."
+  - role_id: evaluator
+    display_name: Evaluator
+    access: full
+    docs_source: evaluation_framework

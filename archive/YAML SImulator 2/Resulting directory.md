@@ -1,0 +1,16 @@
+mentalyc_sim_package_v3/
+  simulation_manifest.yaml
+  specs/
+    ceo_role.yaml
+    scene_what_now.yaml
+    sarai_spec.yaml
+    dataroom_spec.yaml
+    dataroom_tools_scene_what_now.yaml
+    safety_rules.yaml
+    advisor_spec.yaml
+    tech_cofounder_spec.yaml
+    marketing_cofounder_spec.yaml
+    coach_spec.yaml
+    vc_spec.yaml
+    therapist_customers_spec.yaml
+mentalyc_sim_package_v3.zip

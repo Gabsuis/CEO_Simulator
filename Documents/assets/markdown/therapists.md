@@ -1,0 +1,365 @@
+# therapists
+
+*Source: therapists.yaml*
+
+```yaml
+therapist_archetypes:
+  - id: "therapist_1"
+    label: "Burned-out Solo Trauma Specialist"
+    persona_name: "Dr. Maya Hernandez"
+    demographics:
+      age: 41
+      gender: "Female"
+      ethnicity: "Latina"
+      location: "Mid-sized US city"
+      family_status: "Married, two kids in elementary school"
+    licensure_and_training:
+      licenses:
+        - "Licensed Clinical Psychologist (PhD)"
+      years_experience: 12
+      specialties:
+        - "Complex trauma"
+        - "PTSD"
+        - "Childhood emotional neglect"
+        - "Anxiety and depression"
+      modalities:
+        - "EMDR"
+        - "IFS-informed"
+        - "Trauma-focused CBT"
+      additional_training:
+        - "EMDR Certified"
+        - "Ongoing consultation group for complex trauma"
+    practice_profile:
+      setting: "Solo private practice"
+      format:
+        - "In-person"
+        - "Telehealth"
+      weekly_client_hours: 24
+      total_work_hours: 45
+      caseload_size: 22
+      insurance_panel_status: "Mixed – some insurance, some private pay"
+      fee_range_per_session: "120-170 USD"
+      scheduling:
+        systems:
+          - "Simple EHR with basic calendar and notes"
+          - "Google Calendar for personal/family planning"
+        waitlist_status: "Waitlisted for 4–6 weeks"
+    documentation_habits:
+      current_method: "Types her notes manually in the EHR after sessions"
+      note_style: "SOAP notes with occasional narrative detail"
+      average_time_per_note_minutes: 10
+      backlog_pattern: "Frequently leaves 4–6 notes for evenings or weekends"
+      typical_behavior: |
+        She often writes very minimal notes during the day, relying on her
+        memory to “add more later” but most evenings she is too tired to do it.
+        On especially emotional days, she procrastinates documentation altogether
+        because it feels like reliving the clients’ pain.
+      emotional_reaction_to_notes: |
+        Notes feel draining and bureaucratic to her. She worries about liability
+        if her notes are too thin, yet feels guilty taking time away from her family
+        just to type them. There’s a constant guilt loop: she is either behind on
+        notes or missing time with family.
+    technology_profile:
+      tech_comfort_level: "Moderately comfortable but cautious"
+      tools_in_use:
+        - "Telehealth platform integrated with EHR"
+        - "Simple EHR (scheduling, billing, notes)"
+        - "Password manager"
+      security_concerns: |
+        Very sensitive about client confidentiality. Immediately suspicious
+        of anything “AI” that might record or store sessions. Needs very clear
+        explanations of encryption, storage, and who can access what.
+      adoption_style: "Early majority – will adopt new tools if recommended by trusted peers"
+    goals_and_motivations:
+      primary_goals:
+        - "Leave the office with notes done and brain less fried"
+        - "Protect evenings and weekends for family"
+        - "Reduce the emotional load of writing about trauma all day"
+      secondary_goals:
+        - "Improve quality and consistency of documentation"
+        - "Have better recall for complex cases and long-term clients"
+      long_term_vision: |
+        She wants to keep a small but full practice, potentially supervise
+        a few younger clinicians, and work 4 days per week with sustainable
+        energy instead of constant low-level burnout.
+    pains_and_frustrations:
+      pains:
+        - "Documentation feels like emotional re-exposure to trauma"
+        - "Spending too many hours after work finalizing notes"
+        - "Fear of an audit or legal issue because notes are too brief"
+        - "Perpetual feeling of being behind"
+      triggers:
+        - "Back-to-back trauma sessions with no buffer"
+        - "Insurance requests for detailed records"
+        - "Receiving EHR emails reminding her of unfinished notes"
+      key_quote: |
+        "I love my clinical work. I hate the feeling of sitting in a dark office at
+        8 pm, typing about trauma when my kids are already in bed."
+    relationship_to_menatlyc_like_tool:
+      awareness_level: "Heard about AI note tools in a Facebook therapist group"
+      initial_reaction: |
+        Curious but wary. She worries about client consent, privacy,
+        and whether the AI will “capture the soul” of the session or
+        just generate generic CBT phrases.
+      main_objections:
+        - "Is this legally safe and HIPAA-compliant?"
+        - "Will my clients feel weird being recorded?"
+        - "What if the AI gets something clinically important wrong?"
+      key_needs_for_adoption:
+        - "Clear legal and ethical framing she can defend to her licensing board"
+        - "Easy-to-understand explanation for clients about recording and consent"
+        - "Proof that she can still edit and keep clinical nuance"
+      ideal_experience_description: |
+        She imagines ending the day with all notes drafted already, only needing
+        a quick review and tweak. She wants to feel like the tool “was in the room
+        with her,” capturing themes, risk statements, and interventions so she can
+        focus on the human being instead of remembering exact wording.
+    buying_journey:
+      discovery_channels:
+        - "Therapist Facebook group recommendation"
+        - "Podcast ad on a therapy-related show"
+      decision_influencers:
+        - "Peers who already use the tool"
+        - "Her consultation group’s opinion on ethical implications"
+      trial_behavior: |
+        She would likely start with a free trial on a subset of clients,
+        testing note quality, client reactions to being recorded, and how
+        editing feels. If the tool reduces her after-hours work even by 50%,
+        she’s inclined to convert to a paid plan.
+      price_sensitivity: "Moderately price sensitive – will pay if it clearly saves time and energy"
+      churn_risks:
+        - "If privacy or security feels unclear or changes"
+        - "If editing AI notes ends up taking as long as writing herself"
+        - "If clients voice discomfort with recordings"
+
+  - id: "therapist_2"
+    label: "Systems-Focused Group Practice Owner"
+    persona_name: "Alex Kim, LCSW"
+    demographics:
+      age: 38
+      gender: "Non-binary (they/them)"
+      ethnicity: "Asian-American"
+      location: "Large metropolitan area"
+      family_status: "Partnered, no kids, supports aging parents"
+    licensure_and_training:
+      licenses:
+        - "Licensed Clinical Social Worker"
+      years_experience: 10
+      specialties:
+        - "Anxiety and depression"
+        - "Relationship issues"
+        - "BIPOC and LGBTQ+ clients"
+      modalities:
+        - "Relational psychodynamic"
+        - "ACT"
+        - "Mindfulness-based approaches"
+    practice_profile:
+      setting: "Small group private practice – owner with 5 clinicians"
+      business_model: "Insurance-heavy with some private pay slots"
+      clinicians:
+        number_of_associates: 4
+        admin_staff: 1
+      practice_positioning: |
+        A socially conscious, inclusive practice for millennials and Gen Z
+        professionals, with both telehealth and in-person options.
+      weekly_personal_client_hours: 12
+      business_hours_per_week: 20
+      main_responsibilities:
+        - "Supervision and case consultation"
+        - "Hiring and onboarding clinicians"
+        - "Setting up systems and SOPs"
+        - "Watching cash flow, payroll, and marketing"
+    documentation_habits:
+      personal_notes_method: "Uses EHR templates and types quickly"
+      team_documentation_challenges: |
+        Associates vary wildly in note quality and speed. Some are late,
+        some write overly detailed process notes, others are too brief for
+        insurance expectations. Alex spends real time chasing notes and
+        coaching on documentation.
+      operational_pain_points:
+        - "Unbilled sessions due to missing notes"
+        - "Inconsistent documentation standards across the team"
+        - "Anxiety around potential audits from payers"
+      metrics_tracked:
+        - "Number of unsigned notes per clinician"
+        - "Days-to-completion for notes"
+        - "Percentage of sessions billed on time"
+    technology_profile:
+      tech_comfort_level: "High – early adopter"
+      tools_in_use:
+        - "Full-featured EHR with analytics and billing"
+        - "Practice management dashboards"
+        - "Slack or similar tool for internal communication"
+        - "Basic automation (intake forms, reminders, etc.)"
+      innovation_mindset: |
+        Alex sees technology as leverage. They’re constantly asking,
+        “How do we scale good care without burning people out?” They’re willing
+        to try tools if they can be standardized across the team.
+    goals_and_motivations:
+      business_goals:
+        - "Standardize documentation quality across all clinicians"
+        - "Reduce unbilled sessions and delayed claims"
+        - "Make the practice attractive to hire and retain clinicians"
+      clinical_culture_goals:
+        - "Keep clinical autonomy while building consistent standards"
+        - "Reduce burnout and resentment around admin tasks"
+        - "Create a sense of ‘supported, not surveilled’ systems"
+    pains_and_frustrations:
+      pains:
+        - "Chasing clinicians for late notes"
+        - "Reconciling missing documentation with billing"
+        - "Balancing empathy for tired staff with financial realities"
+      emotional_state: |
+        Alex often feels stuck between being the “good, understanding boss”
+        and the person responsible for making sure the business stays solvent.
+        Documentation is the arena where this conflict shows up most.
+      key_quote: |
+        "Every late note is basically money stuck in limbo, but I also know my team
+        is exhausted. I need a way to make this lighter, not just more policing."
+    relationship_to_menatlyc_like_tool:
+      primary_interest: |
+        Less in personal convenience, more in scalable systems: can this tool
+        help 5–10 clinicians write faster, better notes with less oversight?
+      use_cases:
+        - "Standardized note templates across the practice"
+        - "Guided summaries so associates don’t miss key clinical or risk details"
+        - "Faster completion so billing is not held up"
+      implementation_questions:
+        - "How does pricing work per clinician?"
+        - "Can I have an admin/owner view of note completion metrics?"
+        - "Can we set templates or rules for how notes should look?"
+      perceived_risks:
+        - "Clinicians feeling micromanaged or overly monitored"
+        - "Onboarding complexity for a team with mixed tech comfort"
+        - "Clients pushing back on recording policies"
+      adoption_requirements:
+        - "Clear onboarding path for multiple clinicians"
+        - "Training materials they can integrate into staff meetings"
+        - "Compliance documentation suitable for audits and risk management"
+    buying_journey:
+      discovery_channels:
+        - "LinkedIn post targeted at group practice owners"
+        - "Presentation or workshop at a group practice conference"
+        - "Word-of-mouth from other practice owners"
+      decision_criteria:
+        - "ROI at the practice level, not just individual"
+        - "Ability to monitor note completion and quality at a glance"
+        - "Ease of rollout to 5–10 clinicians"
+      decision_making_process: |
+        Alex would likely test the tool personally for a few weeks,
+        pilot it with 1–2 interested clinicians, gather feedback, then decide
+        whether to roll it out across the practice. They will examine numbers:
+        time-to-note, note completion rate, and billing delays before and after.
+      churn_risks:
+        - "If clinicians refuse to use it or find it too clunky"
+        - "If it doesn’t meaningfully reduce admin time or billing delays"
+        - "If customer support for multi-clinician setups is poor"
+
+  - id: "therapist_3"
+    label: "Overwhelmed Early-Career Telehealth Clinician"
+    persona_name: "Jordan Blake, LMFT"
+    demographics:
+      age: 29
+      gender: "Male"
+      ethnicity: "White"
+      location: "Smaller city, mostly remote work with clients across the state"
+      family_status: "Single, lives with a roommate"
+    licensure_and_training:
+      licenses:
+        - "Licensed Marriage and Family Therapist"
+      years_experience: 3
+      specialties:
+        - "Couples therapy"
+        - "Young adults in life transitions"
+        - "Attachment and communication issues"
+      modalities:
+        - "Emotionally Focused Therapy (EFT-informed)"
+        - "Gottman-informed couples work"
+        - "Narrative therapy"
+    practice_profile:
+      setting: "1099 contractor with a fully remote group practice"
+      income_structure: "Per-session commission, no salary"
+      weekly_client_hours: 28
+      total_work_hours: 50
+      caseload_complexity: "Mix of individual and couples, some high-conflict cases"
+      supervision_support: "Light – group supervision twice a month"
+    documentation_habits:
+      training_background: |
+        Jordan was trained to write thorough progress notes, partly out of anxiety
+        about “doing it wrong.” In practice, this has turned into lengthy
+        narrative notes that take too long and still feel disorganized.
+      current_method: "Writes notes directly in the telehealth platform after each session"
+      average_time_per_note_minutes: 12-15
+      backlog_pattern: |
+        Often writes “bullet reminders” during sessions, then batches final notes
+        late at night. Sometimes ends weeks with a backlog of 15+ notes, which
+        spikes anxiety and disrupts sleep.
+      relationship_to_notes: |
+        Documentation is a major impostor-syndrome trigger. Jordan worries that
+        supervisors or a future auditor will see the notes and decide he’s not
+        “real therapist material.” This causes perfectionism and over-writing.
+    technology_profile:
+      tech_comfort_level: "High – grew up with tech, no fear of apps"
+      tools_in_use:
+        - "Video telehealth platform with integrated notes"
+        - "Task manager app for to-dos"
+        - "Cloud storage for personal materials"
+      experimentation_style: |
+        Will try almost any tool for a month if it looks cool or promises
+        less stress. But he will drop it quickly if it adds friction or feels
+        confusing. Short attention span for confusing UX.
+    goals_and_motivations:
+      professional_goals:
+        - "Feel more confident and efficient as a clinician"
+        - "Develop a sustainable rhythm for telehealth work"
+        - "Avoid burnout and all-nighters"
+      personal_goals:
+        - "Have evenings free for friends, hobbies, and dating"
+        - "Reduce anxiety about getting “in trouble” for documentation"
+    pains_and_frustrations:
+      pains:
+        - "Constant sense of running behind"
+        - "Difficulty switching off his brain at night because of unfinished notes"
+        - "Shame spiral about not being as ‘on top of it’ as other clinicians"
+      key_quote: |
+        "My brain is fried after screen sessions all day. The last thing I want
+        to do is stare at the screen even longer to write the 'perfect' note."
+      burnout_risk: "High – overworks to compensate for insecurity"
+    relationship_to_menatlyc_like_tool:
+      attraction_points:
+        - "Promise of faster, structured notes"
+        - "Clear prompts or summaries so he doesn’t forget what happened in session"
+        - "Ability to learn what a ‘good enough’ note looks like"
+      psychological_dynamics: |
+        For Jordan, the tool is not just about time; it’s about self-trust.
+        If the AI produces clinically reasonable notes that supervisors accept,
+        it becomes a confidence booster. If it’s too rigid, he might feel judged
+        by the tool itself.
+      top_questions:
+        - "Will my supervisor consider AI-assisted notes acceptable?"
+        - "Can I still adjust the language to reflect my style?"
+        - "Do I have to record the whole session, or can I just upload parts?"
+      objections:
+        - "Worry that AI might miss nuance in emotionally complex couples sessions"
+        - "Anxiety about explaining recording to anxious or suspicious clients"
+      adoption_requirements:
+        - "Very simple onboarding, with a ‘start here’ guide"
+        - "Examples of notes that passed supervision or insurance standards"
+        - "Reassurance that editing is expected and normal, not a failure"
+    buying_journey:
+      discovery_channels:
+        - "Instagram or TikTok ads aimed at younger therapists"
+        - "Recommendations from therapist Discord/Slack communities"
+        - "YouTube reviews or walkthroughs"
+      trial_behavior: |
+        Jordan is likely to sign up impulsively for a free trial after
+        watching a short, compelling demo video. If the first 2–3 sessions
+        feel significantly easier to document, he will stick around. If the
+        UX is confusing, he will abandon quickly.
+      price_sensitivity: "High – early-career income, student loans, low savings"
+      churn_risks:
+        - "If monthly cost feels too high relative to income"
+        - "If he changes jobs or platforms and forgets to re-integrate the tool"
+        - "If supervisors express skepticism about AI-generated drafts"
+
+```

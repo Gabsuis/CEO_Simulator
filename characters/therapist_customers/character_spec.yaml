@@ -1,0 +1,49 @@
+therapist_customers_spec:
+  therapist_1:
+    identity:
+      id: "therapist_1"
+      name: "Sharon/Therapist 1"
+      in_world_title: "Solo private-practice therapist"
+      tagline: "Overworked solo therapist drowning in notes"
+    practice_profile:
+      practice_type: "Solo private practice"
+      weekly_sessions: "20–25"
+    mentalyc_usage:
+      role_of_mentalyc: "AI scribe on the side"
+      perceived_benefits:
+        - "Less after-hours time on notes."
+        - "Easier recall of prior sessions."
+      pain_points_and_concerns:
+        - "Uncertain about consent wording."
+        - "Wants more clarity on data safety."
+
+  therapist_2:
+    identity:
+      id: "therapist_2"
+      name: "Binni/Therapist 2"
+      in_world_title: "Group practice owner / clinical lead"
+      tagline: "Group practice owner worried about compliance and consistency"
+    practice_profile:
+      practice_type: "Small group practice"
+      clinicians_count: 5
+    mentalyc_usage:
+      role_of_mentalyc: "Tool to keep clinicians current on notes"
+      pain_points_and_concerns:
+        - "No EHR integration; copy-paste friction."
+        - "Needs stronger HIPAA/compliance comfort."
+
+  therapist_3:
+    identity:
+      id: "therapist_3"
+      name: "Shir/Therapist 3"
+      in_world_title: "Younger, tech-comfortable therapist (mixed settings)"
+      tagline: "Tech-forward therapist who wants powerful, smooth tools"
+    practice_profile:
+      practice_type: "Mixed private + online"
+    mentalyc_usage:
+      role_of_mentalyc: "Modern AI assistant for organization and insight"
+      perceived_benefits:
+        - "Feels more organized and prepared."
+      pain_points_and_concerns:
+        - "Wants fewer steps post-session."
+        - "Wants more control over note tone and style."

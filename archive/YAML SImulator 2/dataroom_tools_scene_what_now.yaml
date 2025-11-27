@@ -1,0 +1,8 @@
+tools:
+  - id: "burn_vs_cash_graph_tool"
+    type: "graph"
+    display_name: "Burn vs Cash Graph (MCP)"
+    mcp:
+      enabled: true
+      tool_id: "burn_vs_cash_graph"     # name of the MCP tool on the server
+      server_ref: "default_mcp_server"  # key to pick the right MCPToolClient

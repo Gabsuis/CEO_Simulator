@@ -1,0 +1,150 @@
+scene_what_now:
+  id: "what_now_30_day_challenge"
+  title: "You Just Became CEO. What Now?"
+  knowledge_core:
+   loads:
+          "file": "resources/8 Article series - What Now v2.docx"
+  spec_reference: "Mentioned in SECTION A; detailed article lives in your course materials."
+  note: >
+      This scene models the first ~30 days after you step into the CEO role
+      of Mentalyc. It defines expectations specific to this orientation phase.
+  context:
+    company_state_at_scene_start:
+      stage: "Seed-stage HealthTech / AI for clinical documentation"
+      team:
+        total: 5
+        composition:
+          - "You (CEO)"
+          - "Technical cofounder (CTO)"
+          - "Two engineers"
+          - "Marketing cofounder"
+      customer:
+        - therapist_1
+        - therapist_2
+        - therpaist_3
+
+      product_state:
+        description:
+          - "Working AI note-taking assistant for therapists."
+          - "Small base of paying customers."
+          - "Early revenue, but far from product–market fit."
+      financial_state:
+        cash_in_bank: "Limited, months of runway (per financial model)."
+        investor_expectations:
+          - "Clear path to larger market and scalable growth."
+      human_state:
+        team:
+          - "Some wondering if Mentalyc will 'make it'."
+        ceo:
+          - "You are new in the role; everyone is watching what you do first."
+  time_window:
+    label: "First 30 days as CEO"
+    duration_days: 30
+    narrative_intent: >
+      This scene is about orientation and initial direction-setting, not
+      completing the entire roadmap. It focuses on how you enter the role.
+  scene_goals:
+    primary:
+      - id: "map_reality"
+        description: "Build a brutally honest view of current product, team, runway, and customers."
+        examples_of_evidence:
+          - "You’ve inspected burn, runway, and the financial model."
+          - "You’ve asked about sprints, backlog, and actual velocity."
+          - "You’ve heard from Therapists about real workflow pain and product quality."
+      - id: "choose_next_milestone"
+        description: "Articulate one concrete, near-term company milestone that fits within runway."
+        examples_of_evidence:
+          - "You state: 'Before we hit X months of runway, we must achieve Y.'"
+          - "You connect that milestone to actual epics and GTM steps."
+      - id: "establish_ceo_infrastructure"
+        description: "Set up simple, repeatable CEO infrastructure."
+        examples_of_evidence:
+          - "You define a small set of KPIs to track (usage, PMF, financial)."
+          - "You describe a basic check-in cadence with Tech/Marketing/VC."
+          - "You ask Sarai for summaries/dashboards you plan to revisit."
+      - id: "declare_initial_focus"
+        description: "Make at least one real commitment, not just exploration."
+        examples_of_evidence:
+          - "You pick an initial ICP or therapist persona to optimize for."
+          - "You select a 'hero' user outcome to polish first."
+          - "You state explicit scope cuts or postponements for the next few sprints."
+    secondary:
+      - id: "acknowledge_constraints"
+        description: "Openly recognize the mismatch between roadmap ambition and runway/velocity."
+      - id: "communicate_honestly"
+        description: "Talk to roles in a way that makes constraints visible and shared."
+  scene_evaluation:
+    description: >
+      This scene uses the CEO’s generic evaluation axes but emphasizes
+      some more than others and adds its own criteria for success or
+      partial success within the first 30 days.
+    links_to_ceo_axes:
+      use_axes_from_ceo_role:
+        - "situational_awareness"
+        - "strategic_focus"
+        - "financial_discipline"
+        - "stakeholder_alignment"
+        - "decision_vs_analysis"
+      weighting_for_this_scene:
+        situational_awareness: 0.30
+        strategic_focus: 0.30
+        decision_vs_analysis: 0.20
+        financial_discipline: 0.10
+        stakeholder_alignment: 0.10
+    additional_scene_specific_criteria:
+      - id: "explicit_scene_milestone"
+        description: "Did the CEO articulate a concrete milestone specific to this 30-day window?"
+        values:
+          strong_signals:
+            - "CEO defines a 30-day objective tied to PMF learning, not vanity metrics."
+            - "CEO aligns Tech/Marketing thinking around that 30-day objective."
+          weak_signals:
+            - "CEO speaks vaguely about 'learning' but doesn’t name a milestone."
+      - id: "initial_ceo_infrastructure"
+        description: "Did the CEO put any basic tracking or cadence in place?"
+        values:
+          strong_signals:
+            - "CEO defines 3–5 KPIs and explicitly asks Sarai or roles to revisit them."
+            - "CEO describes a rhythm for updates (e.g., weekly check-ins, monthly recap)."
+          weak_signals:
+            - "CEO understands KPIs conceptually but doesn’t commit to tracking them."
+      - id: "first_real_commitment"
+        description: "Did the CEO commit to at least one non-trivial decision?"
+        values:
+          strong_signals:
+            - "Choosing an ICP."
+            - "Choosing a hero experience to polish."
+            - "Choosing a fundraising or burn-adjustment posture."
+          weak_signals:
+            - "CEO gathers lots of information but avoids stating any commitment."
+  scene_evaluation_process:
+    inputs:
+      - "CEO generic evaluation outputs from ceo_role.internal_behavioral_engine."
+      - "CEO’s prompt history during the 'What Now' scene."
+      - "Evidence of scene goals being met (as collected by Sarai’s analysis)."
+    steps:
+      - step: "Pull generic CEO scores along axes."
+      - step: "Check for scene-specific signals (milestone, infrastructure, commitments)."
+      - step: "Apply scene weighting and aggregate into a scene-specific narrative evaluation."
+      - step: "Return feedback framed as: 'Within your first 30 days, here’s how you showed up.'"
+    possible_outcomes:
+      - id: "strong_on_mapping_weak_on_commitment"
+        description: "CEO deeply understood the world but hesitated to commit."
+      - id: "balanced_start"
+        description: "CEO achieved good awareness and made at least one meaningful commitment."
+      - id: "overconfident_low_awareness"
+        description: "CEO rushed to commitment without mapping reality well."
+      - id: "underutilized_scene"
+        description: "CEO did not significantly progress on either mapping or commitment."
+  interaction_with_ceo:
+    how_to_trigger_scene_eval:
+      examples:
+        - "Sarai: Evaluate me specifically for the 'What now' 30-day CEO challenge."
+        - "Sarai: How did I do in my first 30 days as CEO, according to the scene?"
+        - "Sarai: Evaluate me in the context of the 'What now' 30-day scene."
+      behavior:
+        - "Sarai combines ceo_role evaluation axes with scene_what_now criteria."
+        - "Feedback is phrased as: 'In this early CEO orientation phase, you…'"
+   
+
+---

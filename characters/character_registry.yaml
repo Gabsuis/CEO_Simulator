@@ -1,0 +1,78 @@
+# Character Registry
+# Maps role IDs to their folder locations and metadata
+
+version: "1.0"
+description: "Registry of all characters in the CEO Simulator"
+
+characters:
+  sarai:
+    id: "sarai"
+    name: "Sarai"
+    folder: "sarai"
+    role: "Meta-Orchestrator"
+    session_tier: "all_knowing"
+    description: "All-knowing meta-orchestrator who routes conversations and runs evaluations"
+  
+  tech_cofounder:
+    id: "tech_cofounder"
+    name: "Tech Cofounder"
+    folder: "tech_cofounder"
+    role: "CTO / Technical Cofounder"
+    session_tier: "radical_transparency"
+    description: "Product reality, engineering constraints, and delivery risk"
+  
+  advisor:
+    id: "advisor"
+    name: "Advisor"
+    folder: "advisor"
+    role: "Strategy Advisor"
+    session_tier: "radical_transparency"
+    description: "Strategy, focus, and tradeoffs"
+  
+  marketing_cofounder:
+    id: "marketing_cofounder"
+    name: "Marketing Cofounder"
+    folder: "marketing_cofounder"
+    role: "Head of Marketing"
+    session_tier: "radical_transparency"
+    description: "Positioning, messaging, and growth"
+  
+  vc:
+    id: "vc"
+    name: "VC"
+    folder: "vc"
+    role: "Lead Investor"
+    session_tier: "private"
+    description: "Runway, risk, market size, and fundability"
+  
+  coach:
+    id: "coach"
+    name: "Coach"
+    folder: "coach"
+    role: "Leadership Coach"
+    session_tier: "private"
+    description: "Mindset, stress, leadership growth, inner blocks"
+  
+  therapist_customers:
+    id: "therapist_customers"
+    name: "Therapist Customers"
+    folder: "therapist_customers"
+    role: "Customer Personas"
+    session_tier: "private"
+    description: "Three therapist customer personas providing user feedback"
+    instances: 3  # Creates therapist_1, therapist_2, therapist_3
+
+# Session tier definitions
+session_tiers:
+  all_knowing:
+    description: "Sees all sessions and documents"
+    session_pattern: "base"
+  
+  radical_transparency:
+    description: "Shared session with other radical transparency roles"
+    session_pattern: "base_shared"
+  
+  private:
+    description: "Isolated 1:1 sessions"
+    session_pattern: "base_{role_id}"
+

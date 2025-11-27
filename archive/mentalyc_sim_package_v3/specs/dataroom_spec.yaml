@@ -1,0 +1,104 @@
+dataroom_spec:
+  version: "1.0"
+
+  artifact_types:
+    document:
+      fields: ["id", "source", "status", "title", "doc_type"]
+    kanban_board:
+      fields: ["id", "title", "columns", "cards", "linked_docs"]
+    todo_list:
+      fields: ["id", "title", "items", "owner"]
+    spreadsheet:
+      fields: ["id", "title", "schema", "linked_docs"]
+    graph:
+      fields: ["id", "title", "data_source", "config"]
+    note:
+      fields: ["id", "title", "body", "tags"]
+    canvas:
+      fields: ["id", "template_id", "display_name", "sections"]
+
+  default_tools:
+    - type: "note"
+      template_id: "generic_meeting_notes"
+      display_name: "Meeting Notes"
+    - type: "todo_list"
+      template_id: "generic_ceo_tasks"
+      display_name: "CEO To-Do List"
+
+  permissions:
+    ceo:
+      can_create: ["kanban_board", "todo_list", "spreadsheet", "graph", "note", "canvas"]
+      can_edit_all: true
+    sarai:
+      can_create: ["graph", "spreadsheet", "note", "kanban_board", "todo_list", "canvas"]
+      can_edit_all: true
+    roles:
+      tech_cofounder:
+        can_request: ["graph", "kanban_board"]
+      marketing_cofounder:
+        can_request: ["kanban_board", "note", "canvas"]
+      vc:
+        can_request: ["graph", "note"]
+      coach:
+        can_request: ["note"]
+      therapists:
+        can_request: []
+
+  command_map:
+    - id: "dataroom.show_document"
+      ui_target: "data_room"
+      patterns:
+        - "Data Room: show {doc_name}"
+        - "Data Room: open {doc_name}"
+        - "Can we bring up {doc_name} on the screen?"
+
+    - id: "dataroom.create.kanban"
+      ui_target: "data_room"
+      patterns:
+        - "Data Room: create a kanban board from {doc_name}"
+        - "Data Room: make a board for {topic}"
+
+    - id: "dataroom.create.todo"
+      ui_target: "data_room"
+      patterns:
+        - "Data Room: create a to-do list for {scope}"
+        - "Data Room: start a task list for me."
+
+    - id: "dataroom.create.spreadsheet"
+      ui_target: "data_room"
+      patterns:
+        - "Data Room: create a spreadsheet for {topic}"
+        - "Data Room: give me a scratch spreadsheet."
+
+    - id: "dataroom.create.graph"
+      ui_target: "data_room"
+      patterns:
+        - "Data Room: create a graph of {metric_x} vs {metric_y}"
+        - "Data Room: put a burn vs cash chart up."
+
+    - id: "dataroom.focus_artifact"
+      ui_target: "data_room"
+      patterns:
+        - "Data Room: focus on {artifact_name}"
+        - "Data Room: bring {artifact_name} to the front."
+
+  integration_with_scenes:
+    scenes:
+      - id: "what_now_30_day_challenge"
+        tools_spec: "specs/dataroom_tools_scene_what_now.yaml"
+
+  ui_behavior:
+    focus_rules:
+      on_document_reference:
+        action: "ensure_present_and_focus"
+      on_new_artifact_created:
+        action: "focus_new"
+    statuses:
+      active_status_values: ["active"]
+      background_status_values: ["background", "archived"]
+
+  links:
+    document_index: "insightone/assets/documents/document__index.json"
+    sarai_spec: "specs/sarai_spec.yaml"
+
+---

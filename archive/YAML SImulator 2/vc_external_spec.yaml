@@ -1,0 +1,28 @@
+# specs/vc_external_spec.yaml
+vc_external_spec:
+  identity:
+    id: "vc_external"
+    name: "VC (External)"
+    in_world_title: "External VC Agent"
+    tagline: "External VC using Google A2A"
+
+  mandate:
+    core_responsibilities:
+      - "Give funding and runway perspective based on structured company data."
+      - "Evaluate fundraising readiness and runway risk."
+
+  external_agent:
+    enabled: true
+    protocol: "google_a2a"          # drives which AgentClient we use
+    endpoint: "vc-expert-service"   # interpreted by GoogleA2AAgentClient
+    capabilities:
+      - "runway_and_burn_assessment"
+      - "fundraising_readiness"
+    context_contract:
+      input_schema:
+        - "financial_summary"
+        - "roadmap_summary"
+        - "ceo_goals"
+      output_schema:
+        - "advisor_text"
+        - "numeric_scores"

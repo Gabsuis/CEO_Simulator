@@ -1,0 +1,28 @@
+# Scene Registry
+# Maps scene IDs to their folder locations and metadata
+
+version: "1.0"
+description: "Registry of all available scenes in the CEO Simulator"
+
+scenes:
+  scene1:
+    id: "scene1"
+    name: "What Now?"
+    title: "You Just Became CEO. What Now?"
+    folder: "scene1_what_now"
+    timeframe: "First 30 days as CEO"
+    active: true
+    description: "The CEO's first month - assessing reality, meeting stakeholders, and building basic infrastructure"
+    
+  # Future scenes can be added here:
+  # scene2:
+  #   id: "scene2"
+  #   name: "MVP Launch"
+  #   title: "From PoC to MVP"
+  #   folder: "scene2_mvp_launch"
+  #   timeframe: "Months 2-4"
+  #   active: false
+  #   description: "Launching the MVP and getting first real customer feedback"
+
+default_scene: "scene1"
+

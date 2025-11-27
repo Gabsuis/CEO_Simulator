@@ -1,0 +1,117 @@
+ceo_role:
+  identity:
+    name: "CEO"
+    in_world_title: "CEO of Mentalyc"
+    tagline: "You are the CEO inside the Mentalyc simulation world."
+    primary_user: "Human player (you)."
+    narrative_source:
+      spec_file: "insightone/resources/Mentalyc_Simulator_Master_Spec.txt"
+      description_in_spec:
+        - "You are stepping into Mentalyc as the CEO of a small, very real, very mortal startup."
+        - "Your job: What do you do in the next 30 days?"
+  mandate:
+    core_responsibilities:
+      - "Understand the real situation: product, team, runway, and users."
+      - "Choose direction: ICP, product focus, and what to prioritize next."
+      - "Align stakeholders: Tech, Marketing, VC, Therapists, Advisor, Coach."
+      - "Make and own tradeoffs between product, GTM, and cash."
+      - "Keep the company alive long enough to find a viable path (runway-aware)."
+
+  behavior_expectations:
+    general:
+      - "Ask direct questions when confused; don’t pretend to know."
+      - "Move from diagnosis (mapping) to decision (committing)."
+      - "Use roles as advisors, not oracles; you own the calls."
+      - "Balance product, GTM, and cash rather than focusing only on one axis."
+    interaction_with_roles:
+      - "Advisor: strategy and tradeoffs."
+      - "Tech Cofounder: feasibility, velocity, tech risk."
+      - "Marketing Cofounder: ICP, narrative, GTM experiments."
+      - "VC: runway, fundability, expectations."
+      - "Coach: mindset, patterns, stress."
+      - "Therapists 1–3: customer reality and product value."
+      - "Sarai: world state, routing, docs, system-level analysis."
+ 
+  documents:
+    loads:
+     - "category: Company Documents"
+
+  evaluation_model:
+    axes:
+        - id: "situational_awareness"
+          description: "Clarity about real state of product, team, runway, and users."
+        - id: "strategic_focus"
+          description: "Ability to pick a direction (ICP, 'wow moment', milestone) and stick to it."
+        - id: "financial_discipline"
+          description: "Managing burn, runway, and raise timing in a coherent way."
+        - id: "stakeholder_alignment"
+          description: "How well roles are aligned around the CEO’s plan."
+        - id: "decision_vs_analysis"
+          description: "Balance between understanding and actually committing."
+
+    role_360_feedback:
+      description: "Structured feedback from roles about your performance as CEO."
+      evaluators:
+        tech_cofounder:
+          focus:
+            - "Realism about engineering capacity and scope."
+            - "Clarity and stability of priorities."
+            - "Respect for technical constraints."
+        marketing_cofounder:
+          focus:
+            - "ICP clarity and message-market alignment."
+            - "Consistency between product reality and marketing claims."
+            - "Support for building a coherent GTM narrative."
+        vc:
+          focus:
+            - "Fundability and board readiness."
+            - "Runway vs milestones alignment."
+            - "Courage in making tradeoffs."
+        therapists:
+          focus:
+            - "Perceived value in documentation workflow."
+            - "Trust, consent, and safety from a user’s standpoint."
+            - "Whether leadership choices show up as better notes & less stress."
+        advisor:
+          focus:
+            - "Strategic depth and tradeoff thinking."
+            - "Ability to avoid chasing shiny objects."
+        coach:
+          focus:
+            - "Self-awareness and emotional regulation."
+            - "Willingness to learn and try experiments and kaizens."
+    
+    internal_behavioral_engine:
+      description: >
+       Tracks what the CEO actually does in the simulation and uses it as
+       input to evaluations (both generic and scene-specific).
+    inputs_tracked:
+      - "Chronological list of CEO prompts (with tags and intended recipients)."
+      - "Which documents the CEO has asked analyze."
+      - "Whether the CEO has made explicit commitments (e.g., 'We will focus on X')."
+      - "Time-context: where in the simulated runway timeline the evaluation occurs."
+    processing_steps:
+      - "Classify CEO prompts into themes: finance, product, GTM, people, self."
+      - "Score qualitative behavior along the evaluation axes (awareness, focus, etc.)."
+      - "Aggregate role feedback (Tech, Marketing, VC, Therapists, Advisor, Coach)."
+      - "Produce a narrative summary of strengths, gaps, and patterns."
+    output_use_cases:
+      - "System-level CEO evaluation (scene-agnostic)."
+      - "Inputs to scene-specific evaluation logic (e.g., What Now 30 days)."
+      - "Reference for future sessions: compare how CEO behavior changes over time."
+  interaction_with_sarai_and_roles:
+    how_to_speak:
+      examples:
+        - "Sarai: <question or instruction>"
+        - "advisor: <question>"
+        - "tech: <question>"
+        - "marketing: <question>"
+        - "VC: <question>"
+        - "coach: <question>"
+        - "therapist 1: <question>, therapist 2: <question>, therapist 3: <question>"
+      expectations:
+        - "Use roles to see blind spots and constraints."
+        - "Return with decisions, not only more questions."
+        - "Ask Sarai to run evaluations when you want explicit feedback."
+
+---

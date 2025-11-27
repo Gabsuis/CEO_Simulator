@@ -1,0 +1,154 @@
+{
+  "$schema": "https://insightone.sim/schema/v1/document-index",
+  "version": "1.0",
+  "last_updated": "2025-11-24",
+  "documents": [
+    {
+      "title": "Technology Ventures (Byers, Dorf, Nelson, 4th edition)",
+      "file": "resources/Technology Ventures, Byers, Dorf, Nelson, 4th edition.pdf",
+      "type": "reference",
+      "category": "entrepreneurship",
+      "access": [
+        "advisor"
+      ],
+      "id": "technology_ventures_byers_dorf_nelson_4th_edition",
+      "formats": {
+        "original": "resources/Technology Ventures, Byers, Dorf, Nelson, 4th edition.pdf",
+        "markdown": "resources/markdown/technology_ventures_byers_dorf_nelson_4th_edition.md",
+        "summary": "resources/summaries/technology_ventures_byers_dorf_nelson_4th_edition_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "title": "Startup CEO Textbook",
+      "file": "resources/Startup CEO textbook.docx",
+      "type": "reference",
+      "category": "leadership",
+      "access": [
+        "advisor"
+      ],
+      "id": "startup_ceo_textbook",
+      "formats": {
+        "original": "resources/Startup CEO textbook.docx",
+        "markdown": "resources/markdown/startup_ceo_textbook.md",
+        "summary": "resources/summaries/startup_ceo_textbook_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "title": "Zen Coach Reference Guide and AI Prompt Pack",
+      "file": "resources/Zen_Coach_Reference_Guide_and_AI_Prompt_Pack.pdf",
+      "type": "reference",
+      "category": "reflective_practice",
+      "access": [
+        "coach_module"
+      ],
+      "id": "zen_coach_reference_guide_and_ai_prompt_pack",
+      "formats": {
+        "original": "resources/Zen_Coach_Reference_Guide_and_AI_Prompt_Pack.pdf",
+        "markdown": "resources/markdown/zen_coach_reference_guide_and_ai_prompt_pack.md",
+        "summary": "resources/summaries/zen_coach_reference_guide_and_ai_prompt_pack_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "title": "Enterprise Coaching Book (Silas, de la Maza, Kudinov – Draft Manuscript)",
+      "file": "resources/Kwasi-Edits-Enterprise Coaching Book Silas, de la Maza Kudinov -- Draft Manuscript.pdf",
+      "type": "reference",
+      "category": "reflective_practice",
+      "access": [
+        "coach_module"
+      ],
+      "id": "enterprise_coaching_book_silas_de_la_maza_kudinov__draft_manuscript",
+      "formats": {
+        "original": "resources/Kwasi-Edits-Enterprise Coaching Book Silas, de la Maza Kudinov -- Draft Manuscript.pdf",
+        "markdown": "resources/markdown/enterprise_coaching_book_silas_de_la_maza_kudinov__draft_manuscript.md",
+        "summary": "resources/summaries/enterprise_coaching_book_silas_de_la_maza_kudinov__draft_manuscript_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "title": "The Purpose of Prototypes - Silicon Valley Product Group",
+      "file": "resources/The Purpose of Prototypes - Silicon Valley Product Group _ Silicon Valley Product Group.pdf",
+      "type": "reference",
+      "category": "product_management",
+      "access": [
+        "advisor",
+        "tech_cofounder"
+      ],
+      "id": "the_purpose_of_prototypes___silicon_valley_product_group",
+      "formats": {
+        "original": "resources/The Purpose of Prototypes - Silicon Valley Product Group _ Silicon Valley Product Group.pdf",
+        "markdown": "resources/markdown/the_purpose_of_prototypes___silicon_valley_product_group.md",
+        "summary": "resources/summaries/the_purpose_of_prototypes___silicon_valley_product_group_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "title": "Article: Product Risk Taxonomy - Silicon Valley Product Group",
+      "file": "resources/Article_ Product Risk Taxonomy _ Silicon Valley Product Group.pdf",
+      "type": "reference",
+      "category": "product_management",
+      "access": [
+        "advisor",
+        "tech_cofounder"
+      ],
+      "id": "article:_product_risk_taxonomy___silicon_valley_product_group",
+      "formats": {
+        "original": "resources/Article_ Product Risk Taxonomy _ Silicon Valley Product Group.pdf",
+        "markdown": "resources/markdown/article:_product_risk_taxonomy___silicon_valley_product_group.md",
+        "summary": "resources/summaries/article:_product_risk_taxonomy___silicon_valley_product_group_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "title": "8 Article Series - What Now v2",
+      "file": "resources/8 Article series - What Now v2.docx",
+      "type": "reference",
+      "category": "scenario_content",
+      "access": [
+        "advisor"
+      ],
+      "id": "8_article_series___what_now_v2",
+      "formats": {
+        "original": "resources/8 Article series - What Now v2.docx",
+        "markdown": "resources/markdown/8_article_series___what_now_v2.md",
+        "summary": "resources/summaries/8_article_series___what_now_v2_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    },
+    {
+      "title": "Mentalyc Simulator Master Spec",
+      "file": "resources/Mentalyc_Simulator_Master_Spec.txt",
+      "type": "reference",
+      "category": "simulation_design",
+      "access": [
+        "narrator"
+      ],
+      "id": "mentalyc_simulator_master_spec",
+      "formats": {
+        "original": "resources/Mentalyc_Simulator_Master_Spec.txt",
+        "markdown": "resources/markdown/mentalyc_simulator_master_spec.md",
+        "summary": "resources/summaries/mentalyc_simulator_master_spec_summary.md"
+      },
+      "llm_readable": true,
+      "user_viewable": true
+    }
+  ],
+  "meta": {
+    "index_purpose": "Reference materials for simulation agents - textbooks, coaching guides, product management articles.",
+    "default_access": [
+      "narrator",
+      "advisor",
+      "coach"
+    ],
+    "auto_update": true
+  }
+}

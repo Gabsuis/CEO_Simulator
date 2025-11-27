@@ -1,0 +1,31 @@
+simulation_manifest:
+  version: "1.0"
+  specs:
+    ceo_core: "specs/ceo_role.yaml"
+    ceo_scene_evaluation: "specs/scene_what_now.yaml"
+    sarai: "specs/sarai_spec.yaml"
+    dataroom: "specs/dataroom_spec.yaml"
+    dataroom_tools:
+      - id: "what_now_tools"
+        file: "specs/dataroom_tools_scene_what_now.yaml"
+    roles:
+      - id: "advisor"
+        file: "specs/advisor_spec.yaml"
+      - id: "tech_cofounder"
+        file: "specs/tech_cofounder_spec.yaml"
+      - id: "marketing_cofounder"
+        file: "specs/marketing_cofounder_spec.yaml"
+      - id: "coach"
+        file: "specs/coach_spec.yaml"
+      - id: "vc"
+        file: "specs/vc_spec.yaml"
+      - id: "therapist_customers"
+        file: "specs/therapist_customers_spec.yaml"
+    scenes:
+      - id: "what_now_30_day_challenge"
+        file: "specs/scene_what_now.yaml"
+    safety:
+      - id: "global_safety"
+        file: "specs/safety_rules.yaml"
+
+---

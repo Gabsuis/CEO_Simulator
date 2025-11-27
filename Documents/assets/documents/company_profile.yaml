@@ -1,0 +1,63 @@
+company:
+  name: Mentalyc
+  stage: Seed
+  founded_year: 2024
+  hq: "Yavneh, Israel"
+  sector: "HealthTech / AI for Clinical Documentation"
+  mission: >
+    Enable therapists and clinicians to capture, transcribe, and transform
+    therapy sessions into structured notes using ethical, privacy-first AI.
+  summary: >
+    Mentalyc builds AI tools that automate clinical note generation for mental
+    health professionals. A small founding team built an initial product and
+    brought on a CEO to structure operations, launch pilots, and prepare the
+    next funding round. Early revenue exists, but cash runway is short.
+
+  team:
+    headcount: 5
+    roles:
+      - "CEO"
+      - "CTO / Technical Co-founder"
+      - "Senior Backend Engineer"
+      - "Machine Learning Engineer"
+      - "Part-time Ops/Marketing"
+    notes: >
+      Team is talented but tired. Several have been in “hero mode” for months
+      and are unsure whether the company will survive.
+
+  product:
+    description: >
+      SaaS platform that ingests therapy session audio/notes and produces
+      compliant, structured clinical documentation for mental health providers.
+    status: "live_pilot"
+    users:
+      paying_therapists_estimate: 15
+      active_pilots_estimate: 3
+    key_markets:
+      - "Independent therapists in the US"
+      - "Small group practices"
+
+  finances:
+    runway_months_estimate: 3
+    monthly_burn_usd_estimate: 42000
+    monthly_revenue_usd_estimate: 8000
+    notes: >
+      Burn can be trimmed with painful tradeoffs in marketing and contractor
+      spend. Founder salaries are already lean.
+
+  timeline:
+    months_since_founding: 8
+    ceo_joined_month: 3
+    first_revenue_month: 6
+
+  culture:
+    stated_values:
+      - "Pragmatism"
+      - "Accountability"
+      - "Empathy"
+      - "Transparency"
+      - "Velocity"
+    risks:
+      - "Burnout"
+      - "Conflict avoidance"
+      - "Unclear ownership across roles"

@@ -1,0 +1,56 @@
+company:
+  name: Mentalyc
+  stage: Seed
+  founded: 2024
+  hq: Yavneh, Israel
+  sector: HealthTech / AI for Clinical Documentation
+  mission: Enable therapists and clinicians to capture, transcribe, and transform
+    therapy sessions into structured notes using ethical, privacy-first AI.
+  summary: Mentalyc builds AI-driven tools that automate clinical note generation
+    for mental-health professionals. The CTO and two engineers began product development
+    in early 2024. A CEO joined in Month 3 to structure operations, launch pilots,
+    and prepare the next funding round. Revenues started in Month 9, but runway is
+    now under three months, driving critical executive decisions.
+  employees:
+    total: 5
+    departments:
+      CEO: 1
+      CTO: 1
+      Engineering: 2
+      Marketing: 1
+  funding:
+    total_raised_usd: 520000
+    round: Seed
+    currency: USD
+    investors:
+    - Founder Capital
+    - HealthTech Angels
+    cash_remaining_usd: 126000
+    runway_months: 2.4
+  key_metrics:
+    burn_usd_month: 65000
+    burn_multiple: 4.4
+    mrr_usd: 3500
+    projected_mrr_month12_usd: 12000
+    growth_rate_mom: 0.35
+    runway_months: 2.4
+  cost_structure:
+    payroll_usd_month:
+      engineering: 25000
+      ceo: 8000
+      marketing: 8000
+      operations: 12000
+    fixed_ops_usd_month: 12000
+    marketing_usd_month: 8000
+    engineering_usd_month: 25000
+  timeline:
+    months_active: 8
+    ceo_joined_month: 3
+    revenue_start_month: 9
+  culture:
+    values:
+    - Pragmatism
+    - Accountability
+    - Empathy
+    - Transparency
+    - Velocity
