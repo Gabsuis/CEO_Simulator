@@ -22,13 +22,13 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from google.adk.agents import LlmAgent
+from google.adk.planners import BuiltInPlanner
 from google.adk.tools import FunctionTool, ToolContext
 from google.genai import types
 
 from Documents.services.document_service import get_document_service
 
 # Sarai uses Gemini 2.5 Flash for intelligent orchestration
-# Note: thinking_config must be set via LlmAgent.planner, not GenerateContentConfig
 SARAI_MODEL = "gemini-2.5-flash"
 SARAI_GENERATION_CONFIG = types.GenerateContentConfig(
     temperature=0.1,
@@ -296,10 +296,12 @@ IMPORTANT:
         name="sarai",
         model=SARAI_MODEL,
         description=identity.get('tagline', 'Sarai - Meta-orchestrator'),
-        planner=types.ThinkingConfig(
-            thinking_budget=4096  # Allow thinking tokens for better reasoning
-        ),
         instruction=instruction,
+        planner=BuiltInPlanner(
+            thinking_config=types.ThinkingConfig(
+                thinking_budget=4096,
+            )
+        ),
         tools=[
             # create_transfer_tool(),  # DISABLED: Was causing 'EventActions' errors. Users switch agents via UI.
             create_evaluation_tool(),

@@ -40,18 +40,10 @@ load_dotenv()
 # Google ADK imports
 from google.adk import Runner
 from google.adk.sessions import InMemorySessionService, BaseSessionService
+from google.adk.apps.app import App, EventsCompactionConfig
+from google.adk.apps.llm_event_summarizer import LlmEventSummarizer
+from google.adk.models import Gemini
 from google.genai.types import Content, Part
-
-# Try to import Context Compaction (requires ADK v1.16.0+)
-# Falls back gracefully if not available
-try:
-    from google.adk.apps.app import App, EventsCompactionConfig
-    from google.adk.apps.llm_event_summarizer import LlmEventSummarizer
-    from google.adk.models import Gemini
-    CONTEXT_COMPACTION_AVAILABLE = True
-except ImportError:
-    CONTEXT_COMPACTION_AVAILABLE = False
-    print("⚠️ ADK Context Compaction not available (requires ADK v1.16.0+). Using basic runners.")
 
 # Import our agents
 from adk_agents import (
@@ -131,13 +123,10 @@ class SimulationEngine:
         self.agents = self._create_all_agents()
         print(f"   ✅ Created {len(self.agents)} agents")
         
-        # Create runners for each agent
-        print("   Setting up runners...")
+        # Create runners for each agent (with context compaction)
+        print("   Setting up runners with context compaction...")
         self.runners = self._create_runners()
-        if CONTEXT_COMPACTION_AVAILABLE:
-            print(f"   ✅ Created {len(self.runners)} runners with context compaction")
-        else:
-            print(f"   ✅ Created {len(self.runners)} runners (no compaction - upgrade ADK to v1.16.0+)")
+        print(f"   ✅ Created {len(self.runners)} runners")
         
         # Define session routing
         self.session_routing = self._define_session_routing()
@@ -172,7 +161,7 @@ class SimulationEngine:
         
         return agents
     
-    def _create_compaction_config(self):
+    def _create_compaction_config(self) -> EventsCompactionConfig:
         """
         Create context compaction configuration for automatic summarization.
         
@@ -180,14 +169,8 @@ class SimulationEngine:
         conversation events, preventing prompt overstuffing while preserving
         semantic meaning (unlike simple truncation).
         
-        Returns None if ADK Context Compaction is not available.
-        
         See: https://google.github.io/adk-docs/context/compaction/
         """
-        if not CONTEXT_COMPACTION_AVAILABLE:
-            return None
-        
-        # Use Gemini Flash for fast, cost-effective summarization
         summarization_llm = Gemini(model="gemini-2.5-flash")
         summarizer = LlmEventSummarizer(llm=summarization_llm)
         
@@ -199,10 +182,7 @@ class SimulationEngine:
     
     def _create_runners(self) -> Dict[str, Runner]:
         """
-        Create ADK runners for each agent.
-        
-        If ADK v1.16.0+ is available, uses App with context compaction.
-        Otherwise, falls back to basic Runner.
+        Create ADK Apps with context compaction for each agent.
         
         NOTE: Context compaction is SEPARATE from the 3-tier session architecture:
         - Context compaction: Manages WITHIN-SESSION context (summarizes old events)
@@ -215,23 +195,13 @@ class SimulationEngine:
         compaction_config = self._create_compaction_config()
         
         for agent_name, agent in self.agents.items():
-            if CONTEXT_COMPACTION_AVAILABLE and compaction_config:
-                # Create App with compaction config (ADK v1.16.0+)
-                app = App(
-                    name=f"mentalyc_{agent_name}",
-                    root_agent=agent,
-                    session_service=self.session_service,
-                    events_compaction_config=compaction_config
-                )
-                # Store the app's runner for use in handle_input
-                runners[agent_name] = app.runner
-            else:
-                # Fallback: basic Runner without compaction
-                runners[agent_name] = Runner(
-                    agent=agent,
-                    app_name="mentalyc_simulator",
-                    session_service=self.session_service
-                )
+            app = App(
+                name=f"mentalyc_{agent_name}",
+                root_agent=agent,
+                session_service=self.session_service,
+                events_compaction_config=compaction_config
+            )
+            runners[agent_name] = app.runner
         
         return runners
     
