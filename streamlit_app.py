@@ -45,6 +45,21 @@ def normalize_character_key(character_name):
         return 'therapist_customers'  # All therapists share the same base spec
     return character_name.lower().replace(' ', '_')
 
+def get_character_avatar(character_name):
+    """Get avatar URL or emoji for character"""
+    avatars = {
+        "sarai": "🧠",
+        "tech_cofounder": "👨‍💻",
+        "advisor": "🎯",
+        "marketing_cofounder": "📈",
+        "vc": "💰",
+        "coach": "🏆",
+        "therapist_1": "👥",
+        "therapist_2": "👥",
+        "therapist_3": "👥"
+    }
+    return avatars.get(character_name.lower(), "🤖")
+
 def show_character_introduction(character_name, character_spec):
     """Display character introduction with image and key info"""
 
@@ -65,7 +80,7 @@ def show_character_introduction(character_name, character_spec):
         st.markdown(f"<div style='font-size: 80px; text-align: center; margin: 20px 0;'>{emoji_map.get(character_name, '🤖')}</div>", unsafe_allow_html=True)
 
     # Character info card
-    identity = character_spec.get('identity', {})
+    identity = character_spec.get_identity()
     st.markdown(f"""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin: 10px 0;">
         <h2 style="margin-top: 0;">{identity.get('name', character_name.title())}</h2>
@@ -75,7 +90,7 @@ def show_character_introduction(character_name, character_spec):
     """, unsafe_allow_html=True)
 
     # Personality traits
-    personality = character_spec.get('personality', {})
+    personality = character_spec.spec_data.get('personality', {})
     if 'traits' in personality and personality['traits']:
         with st.expander("🔍 Key Personality Traits", expanded=True):
             for trait in personality['traits'][:3]:  # Show top 3
@@ -100,10 +115,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# Custom CSS - Enhanced for Dream UI
 st.markdown("""
 <style>
-    .header { 
+    .header {
         text-align: center;
         padding: 20px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -120,18 +135,123 @@ st.markdown("""
         font-weight: bold;
         margin: 5px 5px 5px 0;
     }
+    .agent-badge-new {
+        background: linear-gradient(45deg, #ff6b6b, #ffa500) !important;
+        box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.3); }
+        50% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.6); }
+    }
+
+    /* Enhanced Message Styling */
     .chat-message {
-        padding: 12px;
-        border-radius: 8px;
-        margin: 8px 0;
+        padding: 16px;
+        border-radius: 12px;
+        margin: 12px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    .chat-message:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     }
     .message-user {
-        background: #e3f2fd;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
         border-left: 4px solid #2196F3;
+        margin-left: 20px;
+        margin-right: 60px;
     }
     .message-assistant {
-        background: #f5f5f5;
+        background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
         border-left: 4px solid #667eea;
+        margin-right: 20px;
+        margin-left: 60px;
+    }
+
+    /* Avatar Styling */
+    .agent-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        margin-right: 16px;
+        border: 3px solid #667eea;
+        object-fit: cover;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    .agent-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+
+    /* Typing Indicator */
+    .message-typing {
+        animation: typing 1.5s infinite;
+        display: inline-block;
+    }
+    @keyframes typing {
+        0%, 60%, 100% { opacity: 1; }
+        30% { opacity: 0.3; }
+    }
+
+    /* Dream UI Elements */
+    .dream-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 16px;
+        padding: 20px;
+        margin: 12px 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border: 1px solid rgba(102, 126, 234, 0.1);
+    }
+    .dream-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 24px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+    .character-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin: 20px 0;
+    }
+    .character-card {
+        background: white;
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    .character-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    .character-card.selected {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+    }
+
+    /* Scene Elements */
+    .scene-banner {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 16px 0;
+        text-align: center;
+    }
+
+    /* Meeting Panel Styling */
+    .meeting-panel {
+        background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+        border-radius: 16px;
+        padding: 20px;
+        margin: 16px 0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -199,8 +319,8 @@ if "session_id" not in st.session_state:
 if "message_count" not in st.session_state:
     st.session_state.message_count = 0
 
-if "introduced_characters" not in st.session_state:
-    st.session_state.introduced_characters = set()  # Track which characters have been introduced
+if "selected_characters" not in st.session_state:
+    st.session_state.selected_characters = set()  # Track which characters have been selected
 
 # ============================================================================
 # SIDEBAR - AGENT SELECTION & INFO
@@ -212,30 +332,87 @@ with st.sidebar:
     
     # Agent selection
     agents = [a['name'] for a in st.session_state.engine.list_agents()]
-    agent_display = [a.replace('_', ' ').title() for a in agents]
-    
+
+    # Create display names with new character indicators
+    agent_display = []
+    for agent in agents:
+        agent_title = agent.replace('_', ' ').title()
+        is_new = agent not in st.session_state.selected_characters
+        if is_new:
+            agent_display.append(f"🆕 {agent_title}")
+        else:
+            agent_display.append(f"👤 {agent_title}")
+
     selected_idx = agent_display.index(
+        ("🆕 " if st.session_state.current_agent not in st.session_state.selected_characters else "👤 ") +
         st.session_state.current_agent.replace('_', ' ').title()
     )
-    
+
     selected_display = st.selectbox(
         "Select Character",
         agent_display,
         index=selected_idx,
         key="agent_selector"
     )
+
+    # Extract the actual agent name from the display (remove emoji prefix)
+    selected_agent_name = selected_display[3:].lower().replace(' ', '_')  # Remove emoji and convert back
     
-    st.session_state.current_agent = agents[agent_display.index(selected_display)]
-    
+    # Check if this is a new character selection
+    previous_agent = st.session_state.get('current_agent', None)
+    st.session_state.current_agent = selected_agent_name
+
+    # Show introduction for newly selected characters
+    if st.session_state.current_agent != previous_agent and st.session_state.current_agent not in st.session_state.selected_characters:
+        try:
+            from engine.character_loader import CharacterLoader
+            loader = CharacterLoader()
+            char_spec = loader.load_character(normalize_character_key(st.session_state.current_agent))
+
+            st.markdown("---")
+            show_character_introduction(st.session_state.current_agent, char_spec)
+            st.markdown("---")
+
+            # Mark as selected
+            st.session_state.selected_characters.add(st.session_state.current_agent)
+
+        except Exception as e:
+            st.warning(f"Could not load character introduction: {e}")
+
     st.divider()
     
-    # Current session info
-    st.markdown("**📊 Session Info**")
+    # Enhanced Dream UI Session Info
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%); padding: 16px; border-radius: 12px; margin: 16px 0;">
+        <h4 style="margin-top: 0; color: #667eea;">📊 Session Dashboard</h4>
+    </div>
+    """, unsafe_allow_html=True)
+
     col1, col2 = st.columns(2)
     with col1:
-        st.metric("Messages", st.session_state.message_count)
+        st.metric("💬 Messages", st.session_state.message_count)
+        st.metric("🎭 Characters Met", len(st.session_state.selected_characters))
     with col2:
-        st.metric("Current Agent", selected_display)
+        st.metric("👤 Current Agent", selected_display)
+        st.metric("🏢 Scene", "What Now? (30 days)")
+
+    # Scene Status - Dream UI Element
+    st.markdown("---")
+    st.markdown("**🏢 Scene Status**")
+    scene_progress = min(len(st.session_state.selected_characters) * 20, 100)  # Simple progress based on characters met
+    st.progress(scene_progress / 100)
+    st.caption(f"Scene Progress: {scene_progress}% (based on team engagement)")
+
+    # Quick Character Actions
+    st.markdown("---")
+    st.markdown("**⚡ Quick Switches**")
+    quick_chars = ["sarai", "tech_cofounder", "advisor", "vc"]
+    for char in quick_chars:
+        if char != st.session_state.current_agent:
+            char_title = char.replace('_', ' ').title()
+            if st.button(f"→ {char_title}", key=f"quick_{char}", use_container_width=True, help=f"Quick switch to {char_title}"):
+                st.session_state.current_agent = char
+                st.rerun()
     
     # Character description (if available)
     st.markdown("---")
@@ -271,7 +448,7 @@ with st.sidebar:
             # Clear UI state
             st.session_state.messages = []
             st.session_state.message_count = 0
-            st.session_state.introduced_characters = set()  # Reset introductions
+            st.session_state.selected_characters = set()  # Reset selections
             st.rerun()
     with col2:
         # Generate transcript for download
@@ -315,11 +492,18 @@ with st.sidebar:
 # MAIN CHAT AREA
 # ============================================================================
 
-# Header
+# Enhanced Dream UI Header
+current_char_name = st.session_state.current_agent.replace('_', ' ').title()
 st.markdown(f"""
-<div class="header">
-    <h1>🎮 Chatting with {st.session_state.current_agent.replace('_', ' ').title()}</h1>
-    <p>Free-form conversation. Switch agents anytime!</p>
+<div class="dream-header">
+    <h1>🎮 CEO Simulator - Meeting Room</h1>
+    <h2>Currently speaking with {current_char_name}</h2>
+    <p style="opacity: 0.9; margin-bottom: 0;">Navigate complex business challenges with your expert team</p>
+</div>
+
+<div class="scene-banner">
+    <h3 style="margin: 0;">🏢 Scene: "What Now?" - First 30 Days as CEO</h3>
+    <p style="margin: 8px 0 0 0; opacity: 0.9;">Mentalyc is 2.4 months from runway depletion. Time to make critical decisions.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -327,18 +511,51 @@ st.markdown(f"""
 message_container = st.container()
 
 with message_container:
-    # Display all messages
+    # Enhanced Dream UI Meeting Panel
+    st.markdown("""
+    <div class="meeting-panel">
+        <h3 style="margin-top: 0; color: #667eea;">💬 Meeting Room</h3>
+        <p style="color: #666; margin-bottom: 16px;">Real-time conversation with your team</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Display all messages with enhanced styling and avatars
     for i, msg in enumerate(st.session_state.messages):
         if msg["role"] == "user":
+            avatar = "👤"
             st.markdown(f"""
             <div class="chat-message message-user">
-                <strong>👤 You:</strong><br>{msg["content"]}
+                <div style="display: flex; align-items: flex-start; margin-bottom: 8px;">
+                    <div class="agent-avatar" style="background: #2196F3; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">{avatar}</div>
+                    <div style="flex: 1;">
+                        <strong style="color: #1976D2;">You</strong>
+                        <div style="color: #424242; margin-top: 4px;">{msg["content"]}</div>
+                    </div>
+                </div>
             </div>
             """, unsafe_allow_html=True)
         else:
+            character_key = msg["agent"].lower().replace(' ', '_')
+            avatar = get_character_avatar(character_key)
+
+            # Try to show character image if available
+            image_path = get_character_image_path(character_key)
+            avatar_html = ""
+            try:
+                # For now, use emoji avatars - could enhance to show mini character images
+                avatar_html = f'<div class="agent-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">{avatar}</div>'
+            except:
+                avatar_html = f'<div class="agent-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">{avatar}</div>'
+
             st.markdown(f"""
             <div class="chat-message message-assistant">
-                <strong>🤖 {msg["agent"]}:</strong><br>{msg["content"]}
+                <div style="display: flex; align-items: flex-start; margin-bottom: 8px;">
+                    {avatar_html}
+                    <div style="flex: 1;">
+                        <strong style="color: #667eea;">{msg["agent"]}</strong>
+                        <div style="color: #424242; margin-top: 4px;">{msg["content"]}</div>
+                    </div>
+                </div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -401,28 +618,6 @@ if user_input:
             if responses:
                 for response in responses:
                     agent_name = response.speaker.replace('_', ' ').title()
-                    character_key = normalize_character_key(response.speaker)
-
-                    # Check if this is the first time meeting this character
-                    if character_key not in st.session_state.introduced_characters:
-                        # Load character spec and show introduction
-                        try:
-                            from engine.character_loader import CharacterLoader
-                            loader = CharacterLoader()
-                            char_spec = loader.load_character(character_key)
-
-                            st.markdown("---")
-                            show_character_introduction(response.speaker, char_spec)
-                            st.markdown("---")
-
-                            # Mark as introduced
-                            st.session_state.introduced_characters.add(character_key)
-
-                            # Add a small delay for dramatic effect
-                            time.sleep(1)
-
-                        except Exception as e:
-                            st.warning(f"Could not load character introduction: {e}")
 
                     # Add to message history
                     st.session_state.messages.append({
@@ -453,13 +648,98 @@ if user_input:
 # ============================================================================
 
 if not st.session_state.messages:
+    # Dream UI Welcome Experience
     st.markdown("""
-    <div style="text-align: center; padding: 40px; color: #999;">
-        <h3>👋 Welcome to CEO Simulator</h3>
-        <p>Select a character and start a conversation!</p>
-        <p style="font-size: 12px;">
-            💡 Tip: You can switch characters at any time without losing your chat history.
+    <div class="dream-card">
+        <h2 style="text-align: center; color: #667eea; margin-bottom: 8px;">🎮 Welcome to CEO Simulator</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 24px; font-size: 18px;">
+            Step into the shoes of a CEO and navigate complex business challenges with your expert team
         </p>
+
+        <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); padding: 16px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #f39c12;">
+            <h4 style="color: #d68910; margin-top: 0;">📊 Current Scenario</h4>
+            <p style="margin-bottom: 0; color: #8b4513;"><strong>Mentalyc</strong> - AI therapy platform | <strong>Runway:</strong> 2.4 months | <strong>Challenge:</strong> First 30 days as CEO</p>
+        </div>
+
+        <h3 style="color: #667eea; margin-bottom: 16px;">👥 Meet Your Team</h3>
+        <p style="color: #666; margin-bottom: 20px;">Click on any character to get introduced and start a conversation. Each brings unique expertise to help you succeed.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Character Grid - Dream UI Style
+    st.markdown('<div class="character-grid">', unsafe_allow_html=True)
+
+    characters_info = [
+        {"id": "sarai", "name": "Sarai", "emoji": "🧠", "title": "Meta-Orchestrator", "desc": "All-knowing guide & conversation router"},
+        {"id": "tech_cofounder", "name": "Omer", "emoji": "👨‍💻", "title": "CTO/Co-founder", "desc": "Technical reality & engineering constraints"},
+        {"id": "advisor", "name": "Strategy Advisor", "emoji": "🎯", "title": "Strategic Advisor", "desc": "Business strategy & market focus"},
+        {"id": "marketing_cofounder", "name": "Marketing Co-founder", "emoji": "📈", "title": "Head of Marketing", "desc": "GTM strategy & customer acquisition"},
+        {"id": "vc", "name": "VC Investor", "emoji": "💰", "title": "Lead Investor", "desc": "Fundraising & market opportunity"},
+        {"id": "coach", "name": "Leadership Coach", "emoji": "🏆", "title": "Executive Coach", "desc": "Leadership & personal growth"},
+    ]
+
+    cols = st.columns(3)
+    for i, char in enumerate(characters_info):
+        col_idx = i % 3
+        with cols[col_idx]:
+            is_selected = char["id"] == st.session_state.current_agent
+            selected_class = "selected" if is_selected else ""
+
+            st.markdown(f"""
+            <div class="character-card {selected_class}">
+                <div style="font-size: 48px; margin-bottom: 12px;">{char["emoji"]}</div>
+                <h4 style="margin: 8px 0; color: #333;">{char["name"]}</h4>
+                <p style="font-size: 14px; color: #667eea; margin: 4px 0; font-weight: bold;">{char["title"]}</p>
+                <p style="font-size: 13px; color: #666; margin: 8px 0 0 0;">{char["desc"]}</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Quick Actions - Moving towards Dream UI
+    st.markdown("""
+    <div class="dream-card">
+        <h4 style="color: #667eea; margin-bottom: 16px;">🚀 Quick Start Actions</h4>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("🎯 Get Situation Overview", use_container_width=True, help="Ask Sarai for a comprehensive overview of your current situation"):
+            st.session_state.current_agent = "sarai"
+            st.session_state.messages.append({
+                "role": "user",
+                "content": "Give me a comprehensive overview of my current situation as CEO of Mentalyc. What's our runway, key challenges, and immediate priorities?"
+            })
+            st.rerun()
+
+    with col2:
+        if st.button("💰 Check Financial Health", use_container_width=True, help="Get VC's perspective on your financial situation"):
+            st.session_state.current_agent = "vc"
+            st.session_state.messages.append({
+                "role": "user",
+                "content": "What's your assessment of our financial situation? How much runway do we have and what are the key fundraising considerations?"
+            })
+            st.rerun()
+
+    with col3:
+        if st.button("👥 Team Dynamics Check", use_container_width=True, help="Ask Coach about team morale and leadership"):
+            st.session_state.current_agent = "coach"
+            st.session_state.messages.append({
+                "role": "user",
+                "content": "How am I doing as a leader so far? Any observations about team dynamics or my leadership approach?"
+            })
+            st.rerun()
+
+    st.markdown("""
+    <div class="dream-card">
+        <h4 style="color: #667eea; margin-bottom: 12px;">💡 Pro Tips</h4>
+        <ul style="color: #666; margin: 0; padding-left: 20px;">
+            <li><strong>🆕 New characters</strong> appear with glowing indicators in the sidebar</li>
+            <li><strong>Switch anytime</strong> - your conversation history is preserved</li>
+            <li><strong>Start with Sarai</strong> to get oriented, then dive deep with specialists</li>
+            <li><strong>Characters remember</strong> context from your entire conversation</li>
+        </ul>
     </div>
     """, unsafe_allow_html=True)
 
