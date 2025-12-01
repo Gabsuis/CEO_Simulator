@@ -4,10 +4,16 @@ Simulation Engine - ADK Version
 Main orchestrator for the YAML Simulator 2, powered by Google ADK.
 Manages multi-agent conversations with 3-tier session architecture.
 
-Session Architecture:
-- All-Knowing (Sarai): Sees ALL conversations from all sessions
-- Radical Transparency (Tech, Advisor, Marketing): Shared session, see each other's messages
-- Private (VC, Coach, Therapists): Isolated sessions, only Sarai can see them
+Context Management (Two Layers):
+1. WITHIN-SESSION: ADK Context Compaction (automatic LLM summarization of old events)
+   - Prevents prompt overstuffing during long conversations
+   - Configured via EventsCompactionConfig with sliding window
+   - See: https://google.github.io/adk-docs/context/compaction/
+
+2. CROSS-SESSION: 3-Tier Session Architecture (who sees what)
+   - All-Knowing (Sarai): Sees ALL conversations from all sessions
+   - Radical Transparency (Tech, Advisor, Marketing): Shared session
+   - Private (VC, Coach, Therapists): Isolated sessions, only Sarai sees them
 
 Usage:
     engine = SimulationEngine()
@@ -34,6 +40,9 @@ load_dotenv()
 # Google ADK imports
 from google.adk import Runner
 from google.adk.sessions import InMemorySessionService, BaseSessionService
+from google.adk.apps.app import App, EventsCompactionConfig
+from google.adk.apps.llm_event_summarizer import LlmEventSummarizer
+from google.adk.models import Gemini
 from google.genai.types import Content, Part
 
 # Import our agents
@@ -122,8 +131,11 @@ class SimulationEngine:
         # Define session routing
         self.session_routing = self._define_session_routing()
         
-        # Track conversation history for Sarai's all-knowing view
-        # Format: {session_id: [(timestamp, role, speaker, message), ...]}
+        # Track conversation history for Sarai's all-knowing CROSS-SESSION aggregation
+        # This is SEPARATE from ADK's context compaction (which handles WITHIN-SESSION context)
+        # - Context compaction: Automatically summarizes old events within each session
+        # - All-knowing history: Aggregates messages across ALL session tiers for Sarai
+        # Format: {session_id: [{timestamp, tier, role, speaker, message}, ...]}
         self.conversation_history: Dict[str, List[tuple]] = {}
         
         # Debug log for troubleshooting
@@ -149,16 +161,51 @@ class SimulationEngine:
         
         return agents
     
+    def _create_compaction_config(self) -> EventsCompactionConfig:
+        """
+        Create context compaction configuration for automatic summarization.
+        
+        This uses ADK's built-in sliding window approach to summarize older
+        conversation events, preventing prompt overstuffing while preserving
+        semantic meaning (unlike simple truncation).
+        
+        See: https://google.github.io/adk-docs/context/compaction/
+        """
+        # Use Gemini Flash for fast, cost-effective summarization
+        summarization_llm = Gemini(model="gemini-2.5-flash")
+        summarizer = LlmEventSummarizer(llm=summarization_llm)
+        
+        return EventsCompactionConfig(
+            summarizer=summarizer,
+            compaction_interval=5,  # Summarize every 5 invocations
+            overlap_size=1          # Keep 1 invocation for continuity
+        )
+    
     def _create_runners(self) -> Dict[str, Runner]:
-        """Create ADK runners for each agent."""
+        """
+        Create ADK Apps with context compaction for each agent.
+        
+        NOTE: We use App (not bare Runner) to enable automatic context compaction.
+        This is SEPARATE from the 3-tier session architecture:
+        - Context compaction: Manages WITHIN-SESSION context (summarizes old events)
+        - 3-tier architecture: Manages CROSS-SESSION visibility (who sees what)
+        
+        Both work together: compaction keeps individual sessions lean,
+        while the session tiers control information boundaries.
+        """
         runners = {}
+        compaction_config = self._create_compaction_config()
         
         for agent_name, agent in self.agents.items():
-            runners[agent_name] = Runner(
-                agent=agent,
-                app_name="mentalyc_simulator",
-                session_service=self.session_service
+            # Create App with compaction config
+            app = App(
+                name=f"mentalyc_{agent_name}",
+                root_agent=agent,
+                session_service=self.session_service,
+                events_compaction_config=compaction_config
             )
+            # Store the app's runner for use in handle_input
+            runners[agent_name] = app.runner
         
         return runners
     

@@ -28,11 +28,9 @@ from google.genai import types
 from Documents.services.document_service import get_document_service
 
 # Sarai uses Gemini 2.5 Flash for intelligent orchestration
+# Note: thinking_config must be set via LlmAgent.planner, not GenerateContentConfig
 SARAI_MODEL = "gemini-2.5-flash"
 SARAI_GENERATION_CONFIG = types.GenerateContentConfig(
-    thinking_config=types.ThinkingConfig(
-        thinking_budget=4096  # Allow thinking tokens for better reasoning
-    ),
     temperature=0.1,
     top_p=0.95,
     max_output_tokens=2048,
@@ -298,6 +296,9 @@ IMPORTANT:
         name="sarai",
         model=SARAI_MODEL,
         description=identity.get('tagline', 'Sarai - Meta-orchestrator'),
+        planner=types.ThinkingConfig(
+            thinking_budget=4096  # Allow thinking tokens for better reasoning
+        ),
         instruction=instruction,
         tools=[
             # create_transfer_tool(),  # DISABLED: Was causing 'EventActions' errors. Users switch agents via UI.

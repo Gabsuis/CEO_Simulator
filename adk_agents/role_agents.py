@@ -23,12 +23,10 @@ from google.genai import types
 
 from Documents.services.document_service import get_document_service
 
-# Gemini 2.5 Flash configuration with thinking enabled
+# Gemini 2.5 Flash configuration
+# Note: thinking_config must be set via LlmAgent.planner, not GenerateContentConfig
 GEMINI_MODEL = "gemini-2.5-flash"  # Fast model with good reasoning
 GEMINI_CONFIG = types.GenerateContentConfig(
-    thinking_config=types.ThinkingConfig(
-        thinking_budget=4096  # Allow thinking tokens for better reasoning
-    ),
     temperature=0.5,
     top_p=0.95,
     max_output_tokens=2048,
@@ -256,7 +254,9 @@ BEHAVIOR:
     agent = LlmAgent(
         name="advisor",
         model=HUMAN_MODEL,
-        generate_content_config=HUMAN_GENERATION_CONFIG,
+        planner=types.ThinkingConfig(
+            thinking_budget=4096  # Allow thinking tokens for better reasoning
+        ),
         description=spec.get('identity', {}).get('tagline', 'Advisor'),
         instruction=instruction,
         tools=[
@@ -305,7 +305,9 @@ BEHAVIOR:
     agent = LlmAgent(
         name="marketing_cofounder",
         model=HUMAN_MODEL,
-        generate_content_config=HUMAN_GENERATION_CONFIG,
+        planner=types.ThinkingConfig(
+            thinking_budget=4096  # Allow thinking tokens for better reasoning
+        ),
         description=spec.get('identity', {}).get('tagline', 'Marketing Cofounder'),
         instruction=instruction,
         tools=[
@@ -354,7 +356,9 @@ BEHAVIOR:
     agent = LlmAgent(
         name="vc",
         model=HUMAN_MODEL,
-        generate_content_config=HUMAN_GENERATION_CONFIG,
+        planner=types.ThinkingConfig(
+            thinking_budget=4096  # Allow thinking tokens for better reasoning
+        ),
         description=spec.get('identity', {}).get('tagline', 'VC'),
         instruction=instruction,
         tools=[
@@ -403,7 +407,9 @@ BEHAVIOR:
     agent = LlmAgent(
         name="coach",
         model=HUMAN_MODEL,
-        generate_content_config=HUMAN_GENERATION_CONFIG,
+        planner=types.ThinkingConfig(
+            thinking_budget=4096  # Allow thinking tokens for better reasoning
+        ),
         description=spec.get('identity', {}).get('tagline', 'Coach'),
         instruction=instruction,
         tools=[
@@ -465,7 +471,9 @@ BEHAVIOR:
         agent = LlmAgent(
             name=agent_name,
             model=HUMAN_MODEL,
-            generate_content_config=HUMAN_GENERATION_CONFIG,
+            planner=types.ThinkingConfig(
+                thinking_budget=4096  # Allow thinking tokens for better reasoning
+            ),
             description=f"Therapist customer persona {i}",
             instruction=instruction,
             tools=[]  # Therapists don't need document tools
