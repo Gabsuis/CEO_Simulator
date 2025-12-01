@@ -356,15 +356,103 @@ if not st.session_state.messages:
     """, unsafe_allow_html=True)
 
 # ============================================================================
-# DEBUG INFO (DEV ONLY)
+# DEBUG PANEL
 # ============================================================================
 
-with st.expander("🔧 Debug Info"):
-    col1, col2, col3 = st.columns(3)
+with st.expander("🔧 Debug Panel", expanded=False):
+    # Basic info row
+    st.markdown("### 📊 Session Info")
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("User ID", st.session_state.user_id[-8:])
     with col2:
-        st.metric("Session ID", st.session_state.session_id)
+        st.metric("Session ID", st.session_state.session_id[-15:])
     with col3:
-        st.metric("API Key Set", "✅" if os.getenv("GOOGLE_API_KEY") else "❌")
+        st.metric("Messages", st.session_state.message_count)
+    with col4:
+        st.metric("API Key", "✅" if os.getenv("GOOGLE_API_KEY") else "❌")
+    
+    st.divider()
+    
+    # Debug logs section
+    st.markdown("### 📋 Engine Debug Logs")
+    
+    col1, col2 = st.columns([0.7, 0.3])
+    with col1:
+        log_limit = st.slider("Show last N logs", min_value=5, max_value=50, value=15)
+    with col2:
+        if st.button("🗑️ Clear Logs"):
+            st.session_state.engine.clear_debug_logs()
+            st.success("Logs cleared!")
+    
+    # Get and display logs
+    try:
+        logs = st.session_state.engine.get_debug_logs(limit=log_limit)
+        
+        if logs:
+            for log in reversed(logs):  # Most recent first
+                # Color code by level
+                level_colors = {
+                    'info': '🔵',
+                    'warning': '🟡', 
+                    'error': '🔴'
+                }
+                level_icon = level_colors.get(log['level'], '⚪')
+                
+                # Format timestamp
+                timestamp = log['timestamp'].split('T')[1].split('.')[0] if 'T' in log['timestamp'] else log['timestamp']
+                
+                # Create expandable log entry
+                with st.container():
+                    st.markdown(f"**{level_icon} [{timestamp}] {log['message']}**")
+                    
+                    if log['details']:
+                        with st.expander("Details", expanded=log['level'] == 'error'):
+                            for key, value in log['details'].items():
+                                if key == 'traceback':
+                                    st.code(value, language='python')
+                                elif isinstance(value, list):
+                                    st.write(f"**{key}:** {', '.join(str(v) for v in value)}")
+                                else:
+                                    st.write(f"**{key}:** {value}")
+                    
+                    st.markdown("---")
+        else:
+            st.info("No debug logs yet. Send a message to generate logs.")
+    except Exception as e:
+        st.error(f"Error loading logs: {e}")
+    
+    st.divider()
+    
+    # Last response metadata
+    st.markdown("### 📨 Last Response Details")
+    if st.session_state.messages:
+        last_msg = st.session_state.messages[-1]
+        if last_msg.get('role') == 'assistant':
+            st.json({
+                "agent": last_msg.get('agent', 'unknown'),
+                "content_length": len(last_msg.get('content', '')),
+                "content_preview": last_msg.get('content', '')[:200] + '...' if len(last_msg.get('content', '')) > 200 else last_msg.get('content', '')
+            })
+        else:
+            st.info("Last message was from user, not an agent.")
+    else:
+        st.info("No messages yet.")
+    
+    st.divider()
+    
+    # Conversation history (for Sarai's all-knowing view)
+    st.markdown("### 🗂️ Conversation History (All Sessions)")
+    try:
+        history = st.session_state.engine.conversation_history
+        if history:
+            for session_key, messages in history.items():
+                with st.expander(f"Session: {session_key} ({len(messages)} messages)"):
+                    for msg in messages[-5:]:  # Show last 5 per session
+                        role_icon = "👤" if msg['role'] == 'user' else "🤖"
+                        st.markdown(f"{role_icon} **{msg['speaker']}**: {msg['message'][:100]}...")
+        else:
+            st.info("No conversation history recorded yet.")
+    except Exception as e:
+        st.error(f"Error loading history: {e}")
 

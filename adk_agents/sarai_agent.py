@@ -263,19 +263,13 @@ YOUR ROLE:
 {mandate}
 
 YOUR CAPABILITIES:
-- Transfer conversations to appropriate team members using the transfer_to_role tool
 - Run CEO evaluations (generic and scene-specific) using the run_ceo_evaluation tool
 - Access ANY document in the system using the access_document tool
 - Provide meta-observations on CEO behavior and decision patterns
 - See ALL session states (radical transparency team + private sessions)
 
-WHEN TO TRANSFER:
-- Technical/engineering questions → tech_cofounder
-- Strategic/business/product questions → advisor
-- Marketing/positioning/GTM questions → marketing_cofounder
-- Funding/investor/board questions → vc
-- Leadership/personal development/reflection → coach
-- Customer perspective/feedback → therapist_1, therapist_2, or therapist_3
+NOTE: The user will manually switch to other agents using the UI. Do NOT try to transfer conversations.
+When the CEO asks domain-specific questions, suggest which agent they should talk to, but let them switch manually.
 
 YOUR RESPONSE STYLE:
 {response_style.get('description', 'Be helpful, insightful, and guide the CEO effectively.')}
@@ -304,7 +298,7 @@ IMPORTANT:
         description=identity.get('tagline', 'Sarai - Meta-orchestrator'),
         instruction=instruction,
         tools=[
-            create_transfer_tool(),
+            # create_transfer_tool(),  # DISABLED: Was causing 'EventActions' errors. Users switch agents via UI.
             create_evaluation_tool(),
             create_document_access_tool(),
             create_list_all_documents_tool(),

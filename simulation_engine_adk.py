@@ -58,6 +58,15 @@ class EngineResponse:
     metadata: Dict[str, Any]
 
 
+@dataclass
+class DebugLog:
+    """Debug information from engine operations."""
+    timestamp: str
+    level: str  # 'info', 'warning', 'error'
+    message: str
+    details: Dict[str, Any]
+
+
 class SimulationEngine:
     """
     ADK-powered simulation engine with 3-tier session architecture.
@@ -101,6 +110,10 @@ class SimulationEngine:
         # Track conversation history for Sarai's all-knowing view
         # Format: {session_id: [(timestamp, role, speaker, message), ...]}
         self.conversation_history: Dict[str, List[tuple]] = {}
+        
+        # Debug log for troubleshooting
+        self.debug_logs: List[DebugLog] = []
+        self.max_debug_logs = 100  # Keep last 100 entries
         
         print("✅ Simulation Engine ready!\n")
     
@@ -233,6 +246,50 @@ class SimulationEngine:
             return f"{base_session_id}{session_suffix}"
         return base_session_id
     
+    def _log(self, level: str, message: str, details: Dict[str, Any] = None) -> None:
+        """
+        Add a debug log entry.
+        
+        Args:
+            level: 'info', 'warning', or 'error'
+            message: Log message
+            details: Optional additional details
+        """
+        log_entry = DebugLog(
+            timestamp=datetime.now().isoformat(),
+            level=level,
+            message=message,
+            details=details or {}
+        )
+        self.debug_logs.append(log_entry)
+        
+        # Keep only the last N entries
+        if len(self.debug_logs) > self.max_debug_logs:
+            self.debug_logs = self.debug_logs[-self.max_debug_logs:]
+        
+        # Also print for console debugging
+        prefix = {"info": "ℹ️", "warning": "⚠️", "error": "❌"}.get(level, "📝")
+        print(f"{prefix} [{level.upper()}] {message}")
+        if details:
+            for key, value in details.items():
+                print(f"   {key}: {value}")
+    
+    def get_debug_logs(self, limit: int = 20) -> List[Dict[str, Any]]:
+        """Get recent debug logs as dictionaries."""
+        return [
+            {
+                "timestamp": log.timestamp,
+                "level": log.level,
+                "message": log.message,
+                "details": log.details
+            }
+            for log in self.debug_logs[-limit:]
+        ]
+    
+    def clear_debug_logs(self) -> None:
+        """Clear all debug logs."""
+        self.debug_logs = []
+    
     def _record_conversation(
         self,
         session_id: str,
@@ -336,6 +393,13 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
         # Build full session ID
         full_session_id = self._build_session_id(session_id, session_suffix)
         
+        self._log('info', f"Processing message for {agent_name}", {
+            'user_id': user_id,
+            'session_id': full_session_id,
+            'tier': tier,
+            'message_preview': message[:100] + '...' if len(message) > 100 else message
+        })
+        
         # Get runner for this agent
         runner = self.runners[agent_name]
         
@@ -346,9 +410,10 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
                 user_id=user_id,
                 session_id=full_session_id
             )
+            self._log('info', f"Session created/verified: {full_session_id}")
         except Exception as e:
             # Session might already exist, that's okay
-            pass
+            self._log('info', f"Session already exists or creation skipped: {str(e)}")
         
         # Prepare the message
         final_message = message
@@ -358,6 +423,9 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
             all_knowing_context = self._get_all_knowing_context(session_id)
             if all_knowing_context:
                 final_message = f"{all_knowing_context}\nCURRENT MESSAGE FROM CEO:\n{message}"
+                self._log('info', 'Added all-knowing context to Sarai message', {
+                    'context_length': len(all_knowing_context)
+                })
         
         # Record the user's message (for all-knowing aggregation)
         # Don't record Sarai's own session to avoid duplication
@@ -379,8 +447,13 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
         # Run through agent
         responses = []
         collected_text = []
+        event_count = 0
+        event_types = []
+        function_calls = []
         
         try:
+            self._log('info', f"Calling ADK runner for {agent_name}...")
+            
             events = runner.run_async(
                 user_id=user_id,
                 session_id=full_session_id,
@@ -388,12 +461,36 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
             )
             
             async for event in events:
-                # Collect all response parts
+                event_count += 1
+                event_type = type(event).__name__
+                event_types.append(event_type)
+                
+                # Log event details
+                self._log('info', f"Received event #{event_count}: {event_type}", {
+                    'has_content': hasattr(event, 'content') and event.content is not None,
+                    'has_actions': hasattr(event, 'actions'),
+                })
+                
+                # Check for function calls
                 if hasattr(event, 'content') and event.content:
                     for part in event.content.parts:
+                        if hasattr(part, 'function_call') and part.function_call:
+                            func_name = getattr(part.function_call, 'name', 'unknown')
+                            function_calls.append(func_name)
+                            self._log('info', f"Function call detected: {func_name}")
+                        
                         # Collect text parts
                         if hasattr(part, 'text') and part.text:
                             collected_text.append(part.text)
+                            self._log('info', f"Collected text part ({len(part.text)} chars)")
+            
+            self._log('info', f"ADK runner completed", {
+                'total_events': event_count,
+                'event_types': list(set(event_types)),
+                'function_calls': function_calls,
+                'text_parts_collected': len(collected_text),
+                'total_text_length': sum(len(t) for t in collected_text)
+            })
             
             # Combine all collected text into a single response
             if collected_text:
@@ -406,7 +503,37 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
                     metadata={
                         'base_session_id': session_id,
                         'session_suffix': session_suffix,
-                        'original_speaker': speaker
+                        'original_speaker': speaker,
+                        'event_count': event_count,
+                        'function_calls': function_calls
+                    }
+                ))
+                self._log('info', f"Response created for {agent_name}", {
+                    'response_length': len(full_response)
+                })
+            else:
+                # No text collected - this is the silent failure case
+                self._log('warning', f"No text response from {agent_name}", {
+                    'total_events': event_count,
+                    'event_types': list(set(event_types)),
+                    'function_calls': function_calls,
+                    'possible_causes': [
+                        'Model returned only function calls',
+                        'Model returned empty response',
+                        'All events had no text content'
+                    ]
+                })
+                # Return an informative message instead of empty
+                responses.append(EngineResponse(
+                    speaker='system',
+                    text=f"⚠️ {agent_name.replace('_', ' ').title()} did not provide a text response. Events received: {event_count}, Function calls: {function_calls or 'none'}. Check debug panel for details.",
+                    session_id=full_session_id,
+                    session_tier='system',
+                    metadata={
+                        'warning': 'no_text_response',
+                        'event_count': event_count,
+                        'event_types': list(set(event_types)),
+                        'function_calls': function_calls
                     }
                 ))
                 
@@ -422,13 +549,26 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
                     )
         
         except Exception as e:
-            # Error handling
+            # Error handling with detailed logging
+            import traceback
+            error_traceback = traceback.format_exc()
+            
+            self._log('error', f"Exception in handle_input for {agent_name}", {
+                'error_type': type(e).__name__,
+                'error_message': str(e),
+                'traceback': error_traceback
+            })
+            
             responses.append(EngineResponse(
                 speaker='system',
-                text=f"Error: {str(e)}",
+                text=f"❌ Error from {agent_name.replace('_', ' ').title()}: {type(e).__name__}: {str(e)}",
                 session_id=full_session_id,
                 session_tier='system',
-                metadata={'error': str(e)}
+                metadata={
+                    'error': str(e),
+                    'error_type': type(e).__name__,
+                    'traceback': error_traceback
+                }
             ))
         
         return responses
