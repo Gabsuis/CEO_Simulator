@@ -335,18 +335,25 @@ with st.sidebar:
 
     # Create display names with new character indicators
     agent_display = []
+    agent_map = {}  # Map display name back to agent ID
+
     for agent in agents:
         agent_title = agent.replace('_', ' ').title()
         is_new = agent not in st.session_state.selected_characters
-        if is_new:
-            agent_display.append(f"🆕 {agent_title}")
-        else:
-            agent_display.append(f"👤 {agent_title}")
+        display_name = f"🆕 {agent_title}" if is_new else f"👤 {agent_title}"
+        agent_display.append(display_name)
+        agent_map[display_name] = agent
 
-    selected_idx = agent_display.index(
-        ("🆕 " if st.session_state.current_agent not in st.session_state.selected_characters else "👤 ") +
-        st.session_state.current_agent.replace('_', ' ').title()
-    )
+    # Find current agent's display name in the list
+    current_agent_title = st.session_state.current_agent.replace('_', ' ').title()
+    current_is_new = st.session_state.current_agent not in st.session_state.selected_characters
+    current_display = f"🆕 {current_agent_title}" if current_is_new else f"👤 {current_agent_title}"
+
+    # Find the index, default to 0 if not found (shouldn't happen but safety check)
+    try:
+        selected_idx = agent_display.index(current_display)
+    except ValueError:
+        selected_idx = 0  # Default to first agent if current not found
 
     selected_display = st.selectbox(
         "Select Character",
@@ -355,8 +362,8 @@ with st.sidebar:
         key="agent_selector"
     )
 
-    # Extract the actual agent name from the display (remove emoji prefix)
-    selected_agent_name = selected_display[3:].lower().replace(' ', '_')  # Remove emoji and convert back
+    # Get the actual agent name from the map
+    selected_agent_name = agent_map.get(selected_display, agents[0])
     
     # Check if this is a new character selection
     previous_agent = st.session_state.get('current_agent', None)
