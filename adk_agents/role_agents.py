@@ -19,11 +19,24 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from google.adk.agents import LlmAgent
+from google.genai import types
 
 from Documents.services.document_service import get_document_service
 
-# Gemini 2.5 Flash - fast model with good reasoning
-HUMAN_MODEL = "gemini-2.5-flash"
+# Gemini 2.5 Flash configuration with thinking enabled
+GEMINI_MODEL = "gemini-2.5-flash"  # Fast model with good reasoning
+GEMINI_CONFIG = types.GenerateContentConfig(
+    thinking_config=types.ThinkingConfig(
+        thinking_budget=4096  # Allow thinking tokens for better reasoning
+    ),
+    temperature=0.5,
+    top_p=0.95,
+    max_output_tokens=2048,
+)
+
+# Legacy alias for backwards compatibility
+HUMAN_MODEL = GEMINI_MODEL
+HUMAN_GENERATION_CONFIG = GEMINI_CONFIG
 from adk_agents.document_tools import (
     create_document_lookup_tool,
     create_list_documents_tool,
