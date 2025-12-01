@@ -93,8 +93,8 @@ def create_transfer_tool() -> FunctionTool:
                 "message": f"Unknown role: {role}. Valid roles: {', '.join(valid_roles)}"
             }
         
-        # Use ADK's transfer mechanism
-        tool_context.actions().set_transfer_to_agent(agent_name)
+        # Use ADK's transfer mechanism (property assignment per ADK docs)
+        tool_context.actions.transfer_to_agent = agent_name
         
         return {
             "status": "transferring",
