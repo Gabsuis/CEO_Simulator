@@ -26,7 +26,7 @@ from Documents.services.document_service import get_document_service
 # Gemini 3 Pro configuration for intelligent reasoning
 GEMINI_3_MODEL = "gemini-3-pro-preview"  # Latest model with advanced reasoning
 GEMINI_3_CONFIG = types.GenerateContentConfig(
-    thinking_level="low",  # Use low reasoning for stability - minimize latency/costs
+    thinking_level="high",  # Enable deep reasoning for complex tasks
     # Remove explicit temperature - let Gemini 3 use optimized default (1.0)
     top_p=0.95,
     max_output_tokens=2048,
@@ -170,34 +170,38 @@ IMPORTANT: Always reference specific documents when making claims. Use the looku
 def create_tech_cofounder_agent(scene_id: str = "scene1") -> LlmAgent:
     """
     Create Tech Cofounder agent from YAML spec.
-
+    
     Session access: radical_transparency (shared session with Advisor and Marketing)
     Document access: Engineering docs, backlogs, technical specs
-
+    
     Args:
         scene_id: Scene identifier (default: "scene1")
     """
     role_id = "tech_cofounder"
     spec = load_role_spec(role_id)  # Already unwrapped
-
-    # Use simplified instruction to prevent prompt overload
-    instruction = build_instruction_from_spec(spec, role_id, scene_id=scene_id, include_full_scene=False)
+    
+    instruction = build_instruction_from_spec(spec, role_id, scene_id=scene_id)
     
     # Get list of accessible documents for explicit reference
     doc_service = get_document_service()
     accessible = doc_service.list_accessible_documents(role_id)
     doc_list = '\n'.join([f"  - {d['id']}: {d['title']}" for d in accessible])
     
-    # Simplified tech-specific guidance to prevent prompt overload
+    # Additional tech-specific guidance
     instruction += f"""
 
-AVAILABLE DOCUMENTS: {', '.join([d['id'] for d in accessible[:5]])}
+📁 AVAILABLE DOCUMENTS (use these exact IDs with lookup_document tool):
+{doc_list}
 
-CORE PRINCIPLES:
-- Focus on technical feasibility and realistic timelines
-- Reference sprint data when discussing progress
-- Flag risks and technical debt early
-- Use lookup_document() for specific details
+BEHAVIOR:
+- Be direct and technical but not condescending
+- Focus on feasibility, trade-offs, and technical debt
+- Flag risks early and clearly
+- Reference specific sprint data, backlogs, and status reports
+- When asked about timelines, consult the engineering status reports and sprint plans
+- Be honest about what's realistic vs. aspirational
+- ALWAYS use lookup_document("exact_id") when you need specific document details
+- Use the exact document IDs from the list above (without file extensions)
 """
     
     agent = LlmAgent(
