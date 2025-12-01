@@ -12,12 +12,82 @@ import sys
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
+import time
 
 # Load environment variables
 load_dotenv()
 
 # Add project to path
 sys.path.insert(0, str(Path(__file__).parent))
+
+# ============================================================================
+# CHARACTER INTRODUCTION HELPERS
+# ============================================================================
+
+def get_character_image_path(character_name):
+    """Get the path to character image"""
+    image_map = {
+        "sarai": "sarai.png",
+        "tech_cofounder": "tech_cofounder.png",
+        "advisor": "advisor.png",
+        "marketing_cofounder": "marketing_cofounder.png",
+        "vc": "vc.png",
+        "coach": "coach.png",
+        "therapist_1": "therapist_analytical.png",
+        "therapist_2": "therapist_empathic.png",
+        "therapist_3": "therapist_skeptical.png"
+    }
+    return f"Documents/assets/characters/{image_map.get(character_name, 'sarai.png')}"
+
+def normalize_character_key(character_name):
+    """Normalize character names for tracking"""
+    if character_name.startswith('therapist_'):
+        return 'therapist_customers'  # All therapists share the same base spec
+    return character_name.lower().replace(' ', '_')
+
+def show_character_introduction(character_name, character_spec):
+    """Display character introduction with image and key info"""
+
+    # Load character image
+    image_path = get_character_image_path(character_name)
+    try:
+        col1, col2 = st.columns([1, 2])
+        with col1:
+            st.image(image_path, width=150, use_column_width=False)
+        with col2:
+            st.markdown("---")
+    except:
+        # Fallback emoji if image fails
+        emoji_map = {
+            "sarai": "🧠", "tech_cofounder": "👨‍💻", "advisor": "🎯",
+            "marketing_cofounder": "📈", "vc": "💰", "coach": "🏆"
+        }
+        st.markdown(f"<div style='font-size: 80px; text-align: center; margin: 20px 0;'>{emoji_map.get(character_name, '🤖')}</div>", unsafe_allow_html=True)
+
+    # Character info card
+    identity = character_spec.get('identity', {})
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin: 10px 0;">
+        <h2 style="margin-top: 0;">{identity.get('name', character_name.title())}</h2>
+        <h3 style="opacity: 0.9; margin-bottom: 15px;">{identity.get('in_world_title', 'AI Agent')}</h3>
+        <p style="font-style: italic; margin-bottom: 15px;">"{identity.get('tagline', 'AI assistant')}"</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Personality traits
+    personality = character_spec.get('personality', {})
+    if 'traits' in personality and personality['traits']:
+        with st.expander("🔍 Key Personality Traits", expanded=True):
+            for trait in personality['traits'][:3]:  # Show top 3
+                st.markdown(f"• {trait}")
+
+    # Quick backstory
+    if 'backstory' in identity:
+        with st.expander("📖 Quick Background", expanded=False):
+            st.markdown(identity['backstory'])
+
+    st.markdown("---")
+    st.info("💡 **Pro tip:** This character only appears once per session. Get to know them!")
 
 # ============================================================================
 # PAGE CONFIG
@@ -129,6 +199,9 @@ if "session_id" not in st.session_state:
 if "message_count" not in st.session_state:
     st.session_state.message_count = 0
 
+if "introduced_characters" not in st.session_state:
+    st.session_state.introduced_characters = set()  # Track which characters have been introduced
+
 # ============================================================================
 # SIDEBAR - AGENT SELECTION & INFO
 # ============================================================================
@@ -198,6 +271,7 @@ with st.sidebar:
             # Clear UI state
             st.session_state.messages = []
             st.session_state.message_count = 0
+            st.session_state.introduced_characters = set()  # Reset introductions
             st.rerun()
     with col2:
         # Generate transcript for download
@@ -327,21 +401,43 @@ if user_input:
             if responses:
                 for response in responses:
                     agent_name = response.speaker.replace('_', ' ').title()
-                    
+                    character_key = normalize_character_key(response.speaker)
+
+                    # Check if this is the first time meeting this character
+                    if character_key not in st.session_state.introduced_characters:
+                        # Load character spec and show introduction
+                        try:
+                            from engine.character_loader import CharacterLoader
+                            loader = CharacterLoader()
+                            char_spec = loader.load_character(character_key)
+
+                            st.markdown("---")
+                            show_character_introduction(response.speaker, char_spec)
+                            st.markdown("---")
+
+                            # Mark as introduced
+                            st.session_state.introduced_characters.add(character_key)
+
+                            # Add a small delay for dramatic effect
+                            time.sleep(1)
+
+                        except Exception as e:
+                            st.warning(f"Could not load character introduction: {e}")
+
                     # Add to message history
                     st.session_state.messages.append({
                         "role": "assistant",
                         "agent": agent_name,
                         "content": response.text
                     })
-                    
+
                     # Display response
                     st.markdown(f"""
                     <div class="chat-message message-assistant">
                         <strong>🤖 {agent_name}:</strong><br>{response.text}
                     </div>
                     """, unsafe_allow_html=True)
-                    
+
                     st.session_state.message_count += 1
             else:
                 st.error("❌ No response received from the agent. Try again.")
