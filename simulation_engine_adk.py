@@ -4,16 +4,12 @@ Simulation Engine - ADK Version
 Main orchestrator for the YAML Simulator 2, powered by Google ADK.
 Manages multi-agent conversations with 3-tier session architecture.
 
-Context Management (Two Layers):
-1. WITHIN-SESSION: ADK Context Compaction (automatic LLM summarization of old events)
-   - Prevents prompt overstuffing during long conversations
-   - Configured via EventsCompactionConfig with sliding window
-   - See: https://google.github.io/adk-docs/context/compaction/
-
-2. CROSS-SESSION: 3-Tier Session Architecture (who sees what)
-   - All-Knowing (Sarai): Sees ALL conversations from all sessions
-   - Radical Transparency (Tech, Advisor, Marketing): Shared session
-   - Private (VC, Coach, Therapists): Isolated sessions, only Sarai sees them
+Features:
+- BuiltInPlanner: All agents use extended thinking (ThinkingConfig) for better reasoning
+- 3-Tier Session Architecture (who sees what):
+  - All-Knowing (Sarai): Sees ALL conversations from all sessions
+  - Radical Transparency (Tech, Advisor, Marketing): Shared session
+  - Private (VC, Coach, Therapists): Isolated sessions, only Sarai sees them
 
 Usage:
     engine = SimulationEngine()
@@ -40,9 +36,6 @@ load_dotenv()
 # Google ADK imports
 from google.adk import Runner
 from google.adk.sessions import InMemorySessionService, BaseSessionService
-from google.adk.apps.app import App, EventsCompactionConfig
-from google.adk.apps.llm_event_summarizer import LlmEventSummarizer
-from google.adk.models import Gemini
 from google.genai.types import Content, Part
 
 # Import our agents
@@ -123,8 +116,8 @@ class SimulationEngine:
         self.agents = self._create_all_agents()
         print(f"   ✅ Created {len(self.agents)} agents")
         
-        # Create runners for each agent (with context compaction)
-        print("   Setting up runners with context compaction...")
+        # Create runners for each agent
+        print("   Setting up runners...")
         self.runners = self._create_runners()
         print(f"   ✅ Created {len(self.runners)} runners")
         
@@ -161,47 +154,21 @@ class SimulationEngine:
         
         return agents
     
-    def _create_compaction_config(self) -> EventsCompactionConfig:
-        """
-        Create context compaction configuration for automatic summarization.
-        
-        This uses ADK's built-in sliding window approach to summarize older
-        conversation events, preventing prompt overstuffing while preserving
-        semantic meaning (unlike simple truncation).
-        
-        See: https://google.github.io/adk-docs/context/compaction/
-        """
-        summarization_llm = Gemini(model="gemini-2.5-flash")
-        summarizer = LlmEventSummarizer(llm=summarization_llm)
-        
-        return EventsCompactionConfig(
-            summarizer=summarizer,
-            compaction_interval=5,  # Summarize every 5 invocations
-            overlap_size=1          # Keep 1 invocation for continuity
-        )
-    
     def _create_runners(self) -> Dict[str, Runner]:
         """
-        Create ADK Apps with context compaction for each agent.
+        Create ADK runners for each agent.
         
-        NOTE: Context compaction is SEPARATE from the 3-tier session architecture:
-        - Context compaction: Manages WITHIN-SESSION context (summarizes old events)
-        - 3-tier architecture: Manages CROSS-SESSION visibility (who sees what)
-        
-        Both work together: compaction keeps individual sessions lean,
-        while the session tiers control information boundaries.
+        Note: Agents use BuiltInPlanner for extended thinking.
+        Context management is handled by the existing conversation_history tracking.
         """
         runners = {}
-        compaction_config = self._create_compaction_config()
         
         for agent_name, agent in self.agents.items():
-            app = App(
-                name=f"mentalyc_{agent_name}",
-                root_agent=agent,
-                session_service=self.session_service,
-                events_compaction_config=compaction_config
+            runners[agent_name] = Runner(
+                agent=agent,
+                app_name="mentalyc_simulator",
+                session_service=self.session_service
             )
-            runners[agent_name] = app.runner
         
         return runners
     
@@ -409,7 +376,9 @@ class SimulationEngine:
                     tier_context = f"\n📍 {tier_name}:\n"
                     for entry in messages:
                         role_label = "CEO" if entry['role'] == 'user' else entry['speaker'].replace('_', ' ').title()
-                        tier_context += f"[{role_label}]: {entry['message'][:500]}{'...' if len(entry['message']) > 500 else ''}\n"
+                        # Intentional truncation to prevent prompt overstuffing while preserving semantic meaning
+                        truncated_msg = entry['message'][:500] + "..." if len(entry['message']) > 500 else entry['message']
+                        tier_context += f"[{role_label}]: {truncated_msg}\n"
                     context_parts.append(tier_context)
                     total_messages += len(messages)
         
