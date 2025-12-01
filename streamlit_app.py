@@ -253,6 +253,69 @@ st.markdown("""
         padding: 20px;
         margin: 16px 0;
     }
+
+    /* Top Bar Styling */
+    .topbar-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .topbar-collapsed {
+        height: 70px;
+    }
+    .topbar-expanded {
+        height: auto;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+    .topbar-content {
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .topbar-main {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex: 1;
+    }
+    .topbar-controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .character-selector-compact {
+        min-width: 250px;
+    }
+    .topbar-toggle {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+    .topbar-toggle:hover {
+        background: rgba(255,255,255,0.3);
+    }
+    .topbar-expanded-content {
+        padding: 0 16px 16px 16px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* Push main content down when topbar is present */
+    .main-content-spacer {
+        margin-top: 90px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -322,52 +385,83 @@ if "message_count" not in st.session_state:
 if "selected_characters" not in st.session_state:
     st.session_state.selected_characters = set()  # Track which characters have been selected
 
+if "topbar_expanded" not in st.session_state:
+    st.session_state.topbar_expanded = True  # Track if top bar is expanded
+
 # ============================================================================
-# SIDEBAR - AGENT SELECTION & INFO
+# TOP BAR - AGENT SELECTION & INFO
 # ============================================================================
 
-with st.sidebar:
-    st.markdown("### 🎮 CEO Simulator")
-    st.divider()
-    
-    # Agent selection
-    agents = [a['name'] for a in st.session_state.engine.list_agents()]
+# Top Bar Container
+topbar_class = "topbar-expanded" if st.session_state.topbar_expanded else "topbar-collapsed"
 
-    # Create display names with new character indicators
-    agent_display = []
-    agent_map = {}  # Map display name back to agent ID
+st.markdown(f"""
+<div class="topbar-container {topbar_class}">
+    <div class="topbar-content">
+        <div class="topbar-main">
+            <h3 style="margin: 0; color: white;">🎮 CEO Simulator</h3>
+""", unsafe_allow_html=True)
 
-    for agent in agents:
-        agent_title = agent.replace('_', ' ').title()
-        is_new = agent not in st.session_state.selected_characters
-        display_name = f"🆕 {agent_title}" if is_new else f"👤 {agent_title}"
-        agent_display.append(display_name)
-        agent_map[display_name] = agent
+# Agent selection (always visible)
+agents = [a['name'] for a in st.session_state.engine.list_agents()]
 
-    # Find current agent's display name in the list
-    current_agent_title = st.session_state.current_agent.replace('_', ' ').title()
-    current_is_new = st.session_state.current_agent not in st.session_state.selected_characters
-    current_display = f"🆕 {current_agent_title}" if current_is_new else f"👤 {current_agent_title}"
+# Create display names with new character indicators
+agent_display = []
+agent_map = {}  # Map display name back to agent ID
 
-    # Find the index, default to 0 if not found (shouldn't happen but safety check)
-    try:
-        selected_idx = agent_display.index(current_display)
-    except ValueError:
-        selected_idx = 0  # Default to first agent if current not found
+for agent in agents:
+    agent_title = agent.replace('_', ' ').title()
+    is_new = agent not in st.session_state.selected_characters
+    display_name = f"🆕 {agent_title}" if is_new else f"👤 {agent_title}"
+    agent_display.append(display_name)
+    agent_map[display_name] = agent
 
-    selected_display = st.selectbox(
-        "Select Character",
-        agent_display,
-        index=selected_idx,
-        key="agent_selector"
-    )
+# Find current agent's display name in the list
+current_agent_title = st.session_state.current_agent.replace('_', ' ').title()
+current_is_new = st.session_state.current_agent not in st.session_state.selected_characters
+current_display = f"🆕 {current_agent_title}" if current_is_new else f"👤 {current_agent_title}"
 
-    # Get the actual agent name from the map
-    selected_agent_name = agent_map.get(selected_display, agents[0])
-    
-    # Check if this is a new character selection
-    previous_agent = st.session_state.get('current_agent', None)
-    st.session_state.current_agent = selected_agent_name
+# Find the index, default to 0 if not found (shouldn't happen but safety check)
+try:
+    selected_idx = agent_display.index(current_display)
+except ValueError:
+    selected_idx = 0  # Default to first agent if current not found
+
+# Character selector (always visible)
+selected_display = st.selectbox(
+    "Character",
+    agent_display,
+    index=selected_idx,
+    key="character_selector",
+    label_visibility="collapsed"
+)
+
+# Get the actual agent name from the map
+selected_agent_name = agent_map.get(selected_display, agents[0])
+
+# Check if this is a new character selection
+previous_agent = st.session_state.get('current_agent', None)
+st.session_state.current_agent = selected_agent_name
+
+st.markdown("""
+        </div>
+        <div class="topbar-controls">
+""", unsafe_allow_html=True)
+
+# Toggle button
+toggle_label = "🔽 Collapse" if st.session_state.topbar_expanded else "🔼 Expand"
+if st.button(toggle_label, key="topbar_toggle"):
+    st.session_state.topbar_expanded = not st.session_state.topbar_expanded
+    st.rerun()
+
+st.markdown("""
+        </div>
+    </div>
+""", unsafe_allow_html=True)
+
+# Expanded content (only show when expanded)
+if st.session_state.topbar_expanded:
+    st.markdown('<div class="topbar-expanded-content">', unsafe_allow_html=True)
 
     # Show introduction for newly selected characters
     if st.session_state.current_agent != previous_agent and st.session_state.current_agent not in st.session_state.selected_characters:
@@ -376,9 +470,7 @@ with st.sidebar:
             loader = CharacterLoader()
             char_spec = loader.load_character(normalize_character_key(st.session_state.current_agent))
 
-            st.markdown("---")
             show_character_introduction(st.session_state.current_agent, char_spec)
-            st.markdown("---")
 
             # Mark as selected
             st.session_state.selected_characters.add(st.session_state.current_agent)
@@ -386,8 +478,6 @@ with st.sidebar:
         except Exception as e:
             st.warning(f"Could not load character introduction: {e}")
 
-    st.divider()
-    
     # Enhanced Dream UI Session Info
     st.markdown("""
     <div style="background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%); padding: 16px; border-radius: 12px; margin: 16px 0;">
@@ -493,7 +583,12 @@ with st.sidebar:
     Made with 🎨 Streamlit<br>
     Powered by 🧠 Google Gemini
     </div>
-    """, unsafe_allow_html=True)
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Add spacer for main content to account for fixed top bar
+st.markdown('<div class="main-content-spacer"></div>', unsafe_allow_html=True)
 
 # ============================================================================
 # MAIN CHAT AREA
