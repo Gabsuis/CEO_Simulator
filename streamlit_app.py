@@ -60,9 +60,9 @@ def get_character_avatar(character_name):
     }
     return avatars.get(character_name.lower(), "🤖")
 
-@st.dialog("Character Introduction")
+@st.dialog("Character Introduction", width="large")
 def show_character_modal(character_id):
-    """Show character introduction in a modal dialog"""
+    """Show character introduction in a large modal dialog"""
     try:
         from engine.character_loader import CharacterLoader
         loader = CharacterLoader()
@@ -74,46 +74,49 @@ def show_character_modal(character_id):
         # Display character introduction in modal
         identity = char_spec.get_identity()
 
-        # Character portrait
+        # Character portrait - LARGER
         image_path = get_character_image_path(character_id)
         try:
             col1, col2 = st.columns([1, 2])
             with col1:
-                st.image(image_path, width=120, use_column_width=False)
+                st.image(image_path, width=200, use_column_width=False)  # Increased from 120 to 200
             with col2:
-                st.markdown("### " + identity.get('name', character_id.title()))
+                st.markdown("## " + identity.get('name', character_id.title()))  # Changed to h2 for larger text
+                st.markdown(f"**{identity.get('in_world_title', 'AI Agent')}**")
+                st.markdown(f"*{identity.get('tagline', 'AI assistant')}*")
         except:
-            st.markdown(f"<div style='font-size: 60px; text-align: center; margin: 20px 0;'>{get_character_avatar(character_id)}</div>", unsafe_allow_html=True)
-            st.markdown("### " + identity.get('name', character_id.title()))
-
-        # Title and tagline
-        st.markdown(f"**{identity.get('in_world_title', 'AI Agent')}**")
-        st.markdown(f"*{identity.get('tagline', 'AI assistant')}*")
+            st.markdown(f"<div style='font-size: 80px; text-align: center; margin: 30px 0;'>{get_character_avatar(character_id)}</div>", unsafe_allow_html=True)  # Increased from 60 to 80
+            st.markdown("## " + identity.get('name', character_id.title()))
+            st.markdown(f"**{identity.get('in_world_title', 'AI Agent')}**")
+            st.markdown(f"*{identity.get('tagline', 'AI assistant')}*")
 
         st.divider()
 
-        # Personality traits
+        # Personality traits - better formatted
         personality = char_spec.spec_data.get('personality', {})
         if 'traits' in personality and personality['traits']:
-            st.markdown("**🔍 Key Personality Traits:**")
-            for trait in personality['traits'][:3]:
+            st.markdown("### 🔍 Key Personality Traits")
+            for trait in personality['traits'][:4]:  # Increased from 3 to 4 traits
                 st.markdown(f"• {trait}")
+            st.markdown("")  # Add spacing
 
-        # Quick backstory
+        # Quick backstory - expanded by default for larger modal
         if 'backstory' in identity:
-            with st.expander("📖 Quick Background"):
+            with st.expander("📖 Quick Background", expanded=True):  # Expanded by default
                 st.markdown(identity['backstory'])
 
-        # Action buttons
-        col1, col2 = st.columns(2)
+        st.markdown("")  # Add spacing
+
+        # Action buttons - larger and more prominent
+        col1, col2 = st.columns([1, 1])
         with col1:
-            if st.button("💬 Start Conversation", use_container_width=True, type="primary"):
+            if st.button("💬 Start Conversation", use_container_width=True, type="primary", help="Switch to this character and start chatting"):
                 st.session_state.current_agent = character_id
                 st.session_state.show_character_modal = None
                 st.rerun()
 
         with col2:
-            if st.button("❌ Close", use_container_width=True):
+            if st.button("❌ Close", use_container_width=True, help="Close this introduction"):
                 st.session_state.show_character_modal = None
                 st.rerun()
 
@@ -198,14 +201,38 @@ st.markdown("""
         font-weight: bold;
         margin: 5px 5px 5px 0;
     }
-    .agent-badge-new {
-        background: linear-gradient(45deg, #ff6b6b, #ffa500) !important;
-        box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
-        animation: pulse 2s infinite;
+    /* Floating session dashboard */
+    .floating-dashboard {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 12px;
+        padding: 12px 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        z-index: 1000;
+        font-size: 12px;
+        min-width: 200px;
     }
-    @keyframes pulse {
-        0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.3); }
-        50% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.6); }
+    .floating-dashboard h4 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        color: #667eea;
+    }
+    .floating-dashboard .metric-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+        font-size: 11px;
+    }
+    .floating-dashboard .metric-label {
+        color: #666;
+    }
+    .floating-dashboard .metric-value {
+        color: #333;
+        font-weight: bold;
     }
 
     /* Enhanced Message Styling */
@@ -454,28 +481,6 @@ with st.sidebar:
 
     st.divider()
     
-    # Enhanced Dream UI Session Info
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%); padding: 16px; border-radius: 12px; margin: 16px 0;">
-        <h4 style="margin-top: 0; color: #667eea;">📊 Session Dashboard</h4>
-    </div>
-    """, unsafe_allow_html=True)
-
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("💬 Messages", st.session_state.message_count)
-        st.metric("🎭 Characters Met", len(st.session_state.selected_characters))
-    with col2:
-        st.metric("👤 Current Agent", selected_display)
-        st.metric("🏢 Scene", "What Now? (30 days)")
-
-    # Scene Status - Dream UI Element
-    st.markdown("---")
-    st.markdown("**🏢 Scene Status**")
-    scene_progress = min(len(st.session_state.selected_characters) * 20, 100)  # Simple progress based on characters met
-    st.progress(scene_progress / 100)
-    st.caption(f"Scene Progress: {scene_progress}% (based on team engagement)")
-
     # Quick Character Actions
     st.markdown("---")
     st.markdown("**⚡ Quick Switches**")
@@ -485,6 +490,7 @@ with st.sidebar:
             char_title = char.replace('_', ' ').title()
             if st.button(f"→ {char_title}", key=f"quick_{char}", use_container_width=True, help=f"Quick switch to {char_title}"):
                 st.session_state.current_agent = char
+                st.session_state.selected_characters.add(char)  # Mark as selected
                 st.rerun()
     
     # Character description (if available)
@@ -562,23 +568,115 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # ============================================================================
-# MAIN CHAT AREA
+# EMPTY STATE - Show welcome screen when no messages
 # ============================================================================
 
-# Enhanced Dream UI Header
-current_char_name = st.session_state.current_agent.replace('_', ' ').title()
-st.markdown(f"""
-<div class="dream-header">
-    <h1>🎮 CEO Simulator - Meeting Room</h1>
-    <h2>Currently speaking with {current_char_name}</h2>
-    <p style="opacity: 0.9; margin-bottom: 0;">Navigate complex business challenges with your expert team</p>
-</div>
+if not st.session_state.messages:
+    # Dream UI Welcome Experience - Fixed HTML rendering
 
-<div class="scene-banner">
-    <h3 style="margin: 0;">🏢 Scene: "What Now?" - First 30 Days as CEO</h3>
-    <p style="margin: 8px 0 0 0; opacity: 0.9;">Mentalyc is 2.4 months from runway depletion. Time to make critical decisions.</p>
-</div>
-""", unsafe_allow_html=True)
+    # Title and description
+    st.markdown("## 🎮 Welcome to CEO Simulator")
+    st.markdown("*Step into the shoes of a CEO and navigate complex business challenges with your expert team*")
+
+    # Current scenario box
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); padding: 16px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #f39c12;">
+        <h4 style="color: #d68910; margin-top: 0;">📊 Current Scenario</h4>
+        <p style="margin-bottom: 0; color: #8b4513;"><strong>Mentalyc</strong> - AI therapy platform | <strong>Runway:</strong> 2.4 months | <strong>Challenge:</strong> First 30 days as CEO</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Team section header
+    st.markdown("### 👥 Meet Your Team")
+    st.markdown("Click on any character to get introduced and start a conversation. Each brings unique expertise to help you succeed.")
+
+    # Character Grid - Dream UI Style
+    st.markdown('<div class="character-grid">', unsafe_allow_html=True)
+
+    characters_info = [
+        {"id": "sarai", "name": "Sarai", "emoji": "🧠", "title": "Meta-Orchestrator", "desc": "All-knowing guide & conversation router"},
+        {"id": "tech_cofounder", "name": "Omer", "emoji": "👨‍💻", "title": "CTO/Co-founder", "desc": "Technical reality & engineering constraints"},
+        {"id": "advisor", "name": "Strategy Advisor", "emoji": "🎯", "title": "Strategic Advisor", "desc": "Business strategy & market focus"},
+        {"id": "marketing_cofounder", "name": "Marketing Co-founder", "emoji": "📈", "title": "Head of Marketing", "desc": "GTM strategy & customer acquisition"},
+        {"id": "vc", "name": "VC Investor", "emoji": "💰", "title": "Lead Investor", "desc": "Fundraising & market opportunity"},
+        {"id": "coach", "name": "Leadership Coach", "emoji": "🏆", "title": "Executive Coach", "desc": "Leadership & personal growth"},
+    ]
+
+    cols = st.columns(3)
+    for i, char in enumerate(characters_info):
+        col_idx = i % 3
+        with cols[col_idx]:
+            is_selected = char["id"] == st.session_state.current_agent
+            is_new = char["id"] not in st.session_state.selected_characters
+
+            # Create button with conditional styling
+            button_label = f"{char['emoji']} {char['name']}"
+            if is_new:
+                button_label = f"🆕 {button_label}"
+
+            button_type = "primary" if is_selected else "secondary"
+
+            if st.button(
+                button_label,
+                use_container_width=True,
+                type=button_type,
+                help=f"Meet {char['name']} - {char['title']}"
+            ):
+                st.session_state.show_character_modal = char["id"]
+                st.rerun()
+
+            # Show title and description below button
+            st.markdown(f"**{char['title']}**")
+            st.caption(char['desc'])
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Pro Tips section
+    st.markdown("#### 💡 Pro Tips")
+    st.markdown("""
+    - **🆕 New characters** appear with glowing indicators in the sidebar
+    - **Switch anytime** - your conversation history is preserved
+    - **Start with Sarai** to get oriented, then dive deep with specialists
+    - **Characters remember** context from your entire conversation
+    """)
+
+    # Trigger modal if requested
+    if st.session_state.show_character_modal:
+        show_character_modal(st.session_state.show_character_modal)
+
+# ============================================================================
+# MAIN CHAT AREA - Only show when there are messages
+# ============================================================================
+
+else:
+    # Floating Session Dashboard
+    st.markdown(f"""
+    <div class="floating-dashboard">
+        <h4>📊 Session</h4>
+        <div class="metric-row">
+            <span class="metric-label">Messages:</span>
+            <span class="metric-value">{st.session_state.message_count}</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label">Characters met:</span>
+            <span class="metric-value">{len(st.session_state.selected_characters)}</span>
+        </div>
+        <div class="metric-row">
+            <span class="metric-label">Current:</span>
+            <span class="metric-value">{st.session_state.current_agent.replace('_', ' ').title()}</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Enhanced Dream UI Header
+    current_char_name = st.session_state.current_agent.replace('_', ' ').title()
+    st.markdown(f"""
+    <div class="dream-header">
+        <h1>🎮 CEO Simulator - Meeting Room</h1>
+        <h2>Currently speaking with {current_char_name}</h2>
+        <p style="opacity: 0.9; margin-bottom: 0;">Navigate complex business challenges with your expert team</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Message display area
 message_container = st.container()
