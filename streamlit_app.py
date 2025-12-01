@@ -655,23 +655,23 @@ if user_input:
 # ============================================================================
 
 if not st.session_state.messages:
-    # Dream UI Welcome Experience
+    # Dream UI Welcome Experience - Fixed HTML rendering
+
+    # Title and description
+    st.markdown("## 🎮 Welcome to CEO Simulator")
+    st.markdown("*Step into the shoes of a CEO and navigate complex business challenges with your expert team*")
+
+    # Current scenario box
     st.markdown("""
-    <div class="dream-card">
-        <h2 style="text-align: center; color: #667eea; margin-bottom: 8px;">🎮 Welcome to CEO Simulator</h2>
-        <p style="text-align: center; color: #666; margin-bottom: 24px; font-size: 18px;">
-            Step into the shoes of a CEO and navigate complex business challenges with your expert team
-        </p>
-
-        <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); padding: 16px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #f39c12;">
-            <h4 style="color: #d68910; margin-top: 0;">📊 Current Scenario</h4>
-            <p style="margin-bottom: 0; color: #8b4513;"><strong>Mentalyc</strong> - AI therapy platform | <strong>Runway:</strong> 2.4 months | <strong>Challenge:</strong> First 30 days as CEO</p>
-        </div>
-
-        <h3 style="color: #667eea; margin-bottom: 16px;">👥 Meet Your Team</h3>
-        <p style="color: #666; margin-bottom: 20px;">Click on any character to get introduced and start a conversation. Each brings unique expertise to help you succeed.</p>
+    <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); padding: 16px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #f39c12;">
+        <h4 style="color: #d68910; margin-top: 0;">📊 Current Scenario</h4>
+        <p style="margin-bottom: 0; color: #8b4513;"><strong>Mentalyc</strong> - AI therapy platform | <strong>Runway:</strong> 2.4 months | <strong>Challenge:</strong> First 30 days as CEO</p>
     </div>
     """, unsafe_allow_html=True)
+
+    # Team section header
+    st.markdown("### 👥 Meet Your Team")
+    st.markdown("Click on any character to get introduced and start a conversation. Each brings unique expertise to help you succeed.")
 
     # Character Grid - Dream UI Style
     st.markdown('<div class="character-grid">', unsafe_allow_html=True)
@@ -703,52 +703,14 @@ if not st.session_state.messages:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Quick Actions - Moving towards Dream UI
+    # Pro Tips section
+    st.markdown("#### 💡 Pro Tips")
     st.markdown("""
-    <div class="dream-card">
-        <h4 style="color: #667eea; margin-bottom: 16px;">🚀 Quick Start Actions</h4>
-    </div>
-    """, unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if st.button("🎯 Get Situation Overview", use_container_width=True, help="Ask Sarai for a comprehensive overview of your current situation"):
-            st.session_state.current_agent = "sarai"
-            st.session_state.messages.append({
-                "role": "user",
-                "content": "Give me a comprehensive overview of my current situation as CEO of Mentalyc. What's our runway, key challenges, and immediate priorities?"
-            })
-            st.rerun()
-
-    with col2:
-        if st.button("💰 Check Financial Health", use_container_width=True, help="Get VC's perspective on your financial situation"):
-            st.session_state.current_agent = "vc"
-            st.session_state.messages.append({
-                "role": "user",
-                "content": "What's your assessment of our financial situation? How much runway do we have and what are the key fundraising considerations?"
-            })
-            st.rerun()
-
-    with col3:
-        if st.button("👥 Team Dynamics Check", use_container_width=True, help="Ask Coach about team morale and leadership"):
-            st.session_state.current_agent = "coach"
-            st.session_state.messages.append({
-                "role": "user",
-                "content": "How am I doing as a leader so far? Any observations about team dynamics or my leadership approach?"
-            })
-            st.rerun()
-
-    st.markdown("""
-    <div class="dream-card">
-        <h4 style="color: #667eea; margin-bottom: 12px;">💡 Pro Tips</h4>
-        <ul style="color: #666; margin: 0; padding-left: 20px;">
-            <li><strong>🆕 New characters</strong> appear with glowing indicators in the sidebar</li>
-            <li><strong>Switch anytime</strong> - your conversation history is preserved</li>
-            <li><strong>Start with Sarai</strong> to get oriented, then dive deep with specialists</li>
-            <li><strong>Characters remember</strong> context from your entire conversation</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    - **🆕 New characters** appear with glowing indicators in the sidebar
+    - **Switch anytime** - your conversation history is preserved
+    - **Start with Sarai** to get oriented, then dive deep with specialists
+    - **Characters remember** context from your entire conversation
+    """)
 
 # ============================================================================
 # DEBUG PANEL
