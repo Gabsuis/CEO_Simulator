@@ -1,6 +1,6 @@
 # Google AI
 google-genai
-google-adk
+google-adk>=1.19.0  # Context compaction requires v1.16.0+
 
 # Web Framework
 streamlit
