@@ -48,6 +48,21 @@ from adk_agents import (
 )
 
 
+# Character-specific fallback messages when agents return empty responses
+# These maintain character personality even when the model fails to respond
+CHARACTER_FALLBACKS = {
+    'sarai': "I want to make sure I guide you to the right person. Can you clarify what you're looking to achieve?",
+    'tech_cofounder': "Look... I need a moment to pull together the data on that. Can you be more specific about what aspect you want me to focus on?",
+    'advisor': "Here's the thing... that's a complex question. Let me think through this. Can you tell me more about what's driving this inquiry?",
+    'marketing_cofounder': "What I'm hearing from you is interesting, but I want to give you a thoughtful answer. What's the specific context you're working with?",
+    'vc': "Help me understand - what's the specific metric or milestone you're asking about? I want to give you a useful answer.",
+    'coach': "I'm noticing something in your question... Can you say more about what's really on your mind?",
+    'therapist_1': "*pauses thoughtfully* That's an interesting question. Can you tell me more about your situation?",
+    'therapist_2': "I'd like to understand your perspective better as a practice owner. What brought this up?",
+    'therapist_3': "Let me make sure I understand what you're asking. Can you elaborate a bit?",
+}
+
+
 @dataclass
 class EngineResponse:
     """Response from the simulation engine."""
@@ -365,6 +380,124 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
 """
         return header + "\n".join(context_parts) + "\n================================================================================\n"
     
+    def get_session_summary(self, session_id: str, max_entries: int = 10) -> str:
+        """
+        Generate a brief summary of recent conversation history for context.
+        
+        This helps reduce prompt size while maintaining conversation continuity.
+        
+        Args:
+            session_id: The full session ID to summarize
+            max_entries: Maximum number of recent exchanges to include
+        
+        Returns:
+            Formatted summary string of recent conversation
+        """
+        history = self.conversation_history.get(session_id, [])
+        if not history:
+            return ""
+        
+        # Get most recent entries
+        recent = history[-max_entries:]
+        summary_parts = []
+        
+        for entry in recent:
+            role_label = "CEO" if entry['role'] == 'user' else entry['speaker'].replace('_', ' ').title()
+            # Truncate long messages for summary
+            msg_preview = entry['message'][:150] + "..." if len(entry['message']) > 150 else entry['message']
+            summary_parts.append(f"[{role_label}]: {msg_preview}")
+        
+        if not summary_parts:
+            return ""
+        
+        return f"RECENT CONVERSATION ({len(summary_parts)} messages):\n" + "\n".join(summary_parts)
+    
+    async def _run_agent_with_retry(
+        self,
+        runner: Runner,
+        user_id: str,
+        session_id: str,
+        content: Content,
+        agent_name: str,
+        original_message: str
+    ) -> tuple[List[str], int, List[str], List[str], bool]:
+        """
+        Run an agent with automatic retry on empty response.
+        
+        Args:
+            runner: The ADK runner for this agent
+            user_id: User identifier
+            session_id: Full session ID
+            content: The ADK Content to send
+            agent_name: Name of the agent
+            original_message: The original user message (for retry simplification)
+        
+        Returns:
+            Tuple of (collected_text, event_count, event_types, function_calls, was_retry)
+        """
+        collected_text = []
+        event_count = 0
+        event_types = []
+        function_calls = []
+        was_retry = False
+        
+        for attempt in range(2):  # Max 2 attempts (original + 1 retry)
+            if attempt > 0:
+                was_retry = True
+                # Simplify message for retry
+                simplified = f"Please respond briefly to: {original_message[:200]}"
+                content = Content(role='user', parts=[Part(text=simplified)])
+                self._log('info', f"Retry attempt {attempt} with simplified message for {agent_name}")
+            
+            collected_text = []
+            event_count = 0
+            event_types = []
+            function_calls = []
+            
+            events = runner.run_async(
+                user_id=user_id,
+                session_id=session_id,
+                new_message=content
+            )
+            
+            async for event in events:
+                event_count += 1
+                event_type = type(event).__name__
+                event_types.append(event_type)
+                
+                # Log event details
+                self._log('info', f"Received event #{event_count}: {event_type}", {
+                    'has_content': hasattr(event, 'content') and event.content is not None,
+                    'has_actions': hasattr(event, 'actions'),
+                    'is_final': hasattr(event, 'is_final_response') and callable(event.is_final_response) and event.is_final_response()
+                })
+                
+                # Check for function calls and text in content
+                if hasattr(event, 'content') and event.content:
+                    for part in event.content.parts:
+                        if hasattr(part, 'function_call') and part.function_call:
+                            func_name = getattr(part.function_call, 'name', 'unknown')
+                            function_calls.append(func_name)
+                            self._log('info', f"Function call detected: {func_name}")
+                        
+                        # Collect text parts
+                        if hasattr(part, 'text') and part.text:
+                            collected_text.append(part.text)
+                            self._log('info', f"Collected text part ({len(part.text)} chars)")
+                
+                # Check is_final_response() for reliable completion detection
+                if hasattr(event, 'is_final_response') and callable(event.is_final_response):
+                    if event.is_final_response():
+                        self._log('info', f"Final response detected for {agent_name}")
+            
+            # If we got text, no need to retry
+            if collected_text:
+                break
+            
+            self._log('warning', f"No text collected on attempt {attempt + 1} for {agent_name}")
+        
+        return collected_text, event_count, event_types, function_calls, was_retry
+    
     async def handle_input(
         self,
         user_id: str,
@@ -374,6 +507,11 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
     ) -> List[EngineResponse]:
         """
         Handle user input and route to appropriate agent.
+        
+        Features:
+        - Automatic retry with simplified prompt on empty response
+        - Character-specific fallback messages
+        - is_final_response() detection for reliable event handling
         
         Args:
             user_id: User identifier (e.g., 'saul')
@@ -444,53 +582,30 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
             parts=[Part(text=final_message)]
         )
         
-        # Run through agent
+        # Run through agent with retry logic
         responses = []
-        collected_text = []
         full_response = ""  # Initialize to avoid UnboundLocalError
-        event_count = 0
-        event_types = []
-        function_calls = []
         
         try:
             self._log('info', f"Calling ADK runner for {agent_name}...")
             
-            events = runner.run_async(
+            # Use retry-enabled runner
+            collected_text, event_count, event_types, function_calls, was_retry = await self._run_agent_with_retry(
+                runner=runner,
                 user_id=user_id,
                 session_id=full_session_id,
-                new_message=content
+                content=content,
+                agent_name=agent_name,
+                original_message=message
             )
-            
-            async for event in events:
-                event_count += 1
-                event_type = type(event).__name__
-                event_types.append(event_type)
-                
-                # Log event details
-                self._log('info', f"Received event #{event_count}: {event_type}", {
-                    'has_content': hasattr(event, 'content') and event.content is not None,
-                    'has_actions': hasattr(event, 'actions'),
-                })
-                
-                # Check for function calls
-                if hasattr(event, 'content') and event.content:
-                    for part in event.content.parts:
-                        if hasattr(part, 'function_call') and part.function_call:
-                            func_name = getattr(part.function_call, 'name', 'unknown')
-                            function_calls.append(func_name)
-                            self._log('info', f"Function call detected: {func_name}")
-                        
-                        # Collect text parts
-                        if hasattr(part, 'text') and part.text:
-                            collected_text.append(part.text)
-                            self._log('info', f"Collected text part ({len(part.text)} chars)")
             
             self._log('info', f"ADK runner completed", {
                 'total_events': event_count,
                 'event_types': list(set(event_types)),
                 'function_calls': function_calls,
                 'text_parts_collected': len(collected_text),
-                'total_text_length': sum(len(t) for t in collected_text)
+                'total_text_length': sum(len(t) for t in collected_text),
+                'was_retry': was_retry
             })
             
             # Combine all collected text into a single response
@@ -506,42 +621,50 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
                         'session_suffix': session_suffix,
                         'original_speaker': speaker,
                         'event_count': event_count,
-                        'function_calls': function_calls
+                        'function_calls': function_calls,
+                        'was_retry': was_retry
                     }
                 ))
                 self._log('info', f"Response created for {agent_name}", {
                     'response_length': len(full_response)
                 })
             else:
-                # No text collected - this is the silent failure case
-                full_response = f"⚠️ {agent_name.replace('_', ' ').title()} did not provide a text response. Events received: {event_count}, Function calls: {function_calls or 'none'}. Check debug panel for details."
-                self._log('warning', f"No text response from {agent_name}", {
+                # No text collected even after retry - use character-specific fallback
+                fallback_message = CHARACTER_FALLBACKS.get(
+                    agent_name, 
+                    "I need a moment to gather my thoughts. Can you rephrase that?"
+                )
+                full_response = fallback_message
+                
+                self._log('warning', f"No text response from {agent_name} - using fallback", {
                     'total_events': event_count,
                     'event_types': list(set(event_types)),
                     'function_calls': function_calls,
-                    'possible_causes': [
-                        'Model returned only function calls',
-                        'Model returned empty response',
-                        'All events had no text content'
-                    ]
+                    'was_retry': was_retry,
+                    'fallback_used': True
                 })
-                # Return an informative message instead of empty
+                
+                # Return the character-appropriate fallback as if the agent said it
                 responses.append(EngineResponse(
-                    speaker='system',
+                    speaker=agent_name,  # Use agent name, not 'system'
                     text=full_response,
                     session_id=full_session_id,
-                    session_tier='system',
+                    session_tier=tier,
                     metadata={
-                        'warning': 'no_text_response',
+                        'base_session_id': session_id,
+                        'session_suffix': session_suffix,
+                        'original_speaker': speaker,
                         'event_count': event_count,
-                        'event_types': list(set(event_types)),
-                        'function_calls': function_calls
+                        'function_calls': function_calls,
+                        'was_retry': was_retry,
+                        'fallback_used': True,
+                        'warning': 'no_text_response_fallback_used'
                     }
                 ))
 
-            # Record agent's response (for all-knowing aggregation) - only if we had a response from the actual agent
-            # Don't record Sarai's own responses or system error messages
-            if tier != 'all_knowing' and responses and responses[-1].speaker == agent_name:
+            # Record agent's response (for all-knowing aggregation)
+            # Don't record Sarai's own responses
+            if tier != 'all_knowing' and responses:
                 self._record_conversation(
                     session_id=full_session_id,
                     tier=tier,
@@ -554,23 +677,30 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
             # Error handling with detailed logging
             import traceback
             error_traceback = traceback.format_exc()
-            full_response = ""  # Ensure it's defined for any recording logic
-
+            
             self._log('error', f"Exception in handle_input for {agent_name}", {
                 'error_type': type(e).__name__,
                 'error_message': str(e),
                 'traceback': error_traceback
             })
+            
+            # Even on error, use a character-appropriate message if possible
+            fallback_message = CHARACTER_FALLBACKS.get(
+                agent_name,
+                "I'm having trouble processing that right now. Can you try again?"
+            )
+            full_response = fallback_message
 
             responses.append(EngineResponse(
-                speaker='system',
-                text=f"❌ Error from {agent_name.replace('_', ' ').title()}: {type(e).__name__}: {str(e)}",
+                speaker=agent_name,  # Use agent name for consistency
+                text=f"{fallback_message}\n\n_(Technical issue occurred - check debug panel)_",
                 session_id=full_session_id,
-                session_tier='system',
+                session_tier=tier,
                 metadata={
                     'error': str(e),
                     'error_type': type(e).__name__,
-                    'traceback': error_traceback
+                    'traceback': error_traceback,
+                    'fallback_used': True
                 }
             ))
         
