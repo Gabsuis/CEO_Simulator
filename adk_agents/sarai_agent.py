@@ -27,12 +27,15 @@ from google.genai import types
 
 from Documents.services.document_service import get_document_service
 
-# Sarai uses a slightly lower temperature - she's an orchestrator, needs to be reliable
-SARAI_MODEL = "gemini-2.5-flash"
+# Sarai uses Gemini 3 Pro for intelligent orchestration
+SARAI_MODEL = "gemini-3-pro-preview"
 SARAI_GENERATION_CONFIG = types.GenerateContentConfig(
-    temperature=0.2,  # Slightly lower for reliability
+    thinking_level="high",  # Deep reasoning for complex orchestration
+    # Remove explicit temperature - let Gemini 3 optimize
     top_p=0.95,
     max_output_tokens=2048,
+    # High resolution for document processing
+    media_resolution="high",
 )
 from adk_agents.scene_context import get_scene_context
 from engine import get_character_loader

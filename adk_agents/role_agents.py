@@ -23,14 +23,20 @@ from google.genai import types
 
 from Documents.services.document_service import get_document_service
 
-# Model configuration for human-like responses
-HUMAN_MODEL = "gemini-2.5-flash"  # Better quality than flash-lite
-HUMAN_GENERATION_CONFIG = types.GenerateContentConfig(
-    temperature=0.85,  # More creative and varied responses
+# Gemini 3 Pro configuration for intelligent reasoning
+GEMINI_3_MODEL = "gemini-3-pro-preview"  # Latest model with advanced reasoning
+GEMINI_3_CONFIG = types.GenerateContentConfig(
+    thinking_level="high",  # Enable deep reasoning for complex tasks
+    # Remove explicit temperature - let Gemini 3 use optimized default (1.0)
     top_p=0.95,
-    top_k=40,
     max_output_tokens=2048,
+    # High resolution for document processing (PDFs, images)
+    media_resolution="high",
 )
+
+# Legacy alias for backwards compatibility
+HUMAN_MODEL = GEMINI_3_MODEL
+HUMAN_GENERATION_CONFIG = GEMINI_3_CONFIG
 from adk_agents.document_tools import (
     create_document_lookup_tool,
     create_list_documents_tool,
