@@ -91,15 +91,27 @@ if not os.getenv("GOOGLE_API_KEY"):
 # INITIALIZE SESSION STATE
 # ============================================================================
 
+# Engine version - increment this to force cache refresh when engine code changes
+ENGINE_VERSION = "2.0"
+
 @st.cache_resource
-def get_simulation_engine():
-    """Initialize simulation engine (cached across reruns)."""
+def get_simulation_engine(_version: str):
+    """Initialize simulation engine (cached across reruns).
+    
+    The _version parameter forces cache invalidation when we update the engine.
+    """
     from simulation_engine_adk import SimulationEngine
     return SimulationEngine()
 
 # Initialize session state
 if "engine" not in st.session_state:
-    st.session_state.engine = get_simulation_engine()
+    st.session_state.engine = get_simulation_engine(ENGINE_VERSION)
+
+# Check if engine needs refresh (version mismatch or missing new methods)
+if not hasattr(st.session_state.engine, 'get_debug_logs'):
+    # Clear the cache and reinitialize
+    get_simulation_engine.clear()
+    st.session_state.engine = get_simulation_engine(ENGINE_VERSION)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
