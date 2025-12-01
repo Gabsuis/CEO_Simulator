@@ -447,6 +447,7 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
         # Run through agent
         responses = []
         collected_text = []
+        full_response = ""  # Initialize to avoid UnboundLocalError
         event_count = 0
         event_types = []
         function_calls = []
@@ -513,6 +514,7 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
                 })
             else:
                 # No text collected - this is the silent failure case
+                full_response = f"⚠️ {agent_name.replace('_', ' ').title()} did not provide a text response. Events received: {event_count}, Function calls: {function_calls or 'none'}. Check debug panel for details."
                 self._log('warning', f"No text response from {agent_name}", {
                     'total_events': event_count,
                     'event_types': list(set(event_types)),
@@ -526,7 +528,7 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
                 # Return an informative message instead of empty
                 responses.append(EngineResponse(
                     speaker='system',
-                    text=f"⚠️ {agent_name.replace('_', ' ').title()} did not provide a text response. Events received: {event_count}, Function calls: {function_calls or 'none'}. Check debug panel for details.",
+                    text=full_response,
                     session_id=full_session_id,
                     session_tier='system',
                     metadata={
@@ -536,29 +538,30 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
                         'function_calls': function_calls
                     }
                 ))
-                
-                # Record agent's response (for all-knowing aggregation)
-                # Don't record Sarai's own responses
-                if tier != 'all_knowing':
-                    self._record_conversation(
-                        session_id=full_session_id,
-                        tier=tier,
-                        role='assistant',
-                        speaker=agent_name,
-                        message=full_response
-                    )
+
+            # Record agent's response (for all-knowing aggregation) - only if we had a response from the actual agent
+            # Don't record Sarai's own responses or system error messages
+            if tier != 'all_knowing' and responses and responses[-1].speaker == agent_name:
+                self._record_conversation(
+                    session_id=full_session_id,
+                    tier=tier,
+                    role='assistant',
+                    speaker=agent_name,
+                    message=full_response
+                )
         
         except Exception as e:
             # Error handling with detailed logging
             import traceback
             error_traceback = traceback.format_exc()
-            
+            full_response = ""  # Ensure it's defined for any recording logic
+
             self._log('error', f"Exception in handle_input for {agent_name}", {
                 'error_type': type(e).__name__,
                 'error_message': str(e),
                 'traceback': error_traceback
             })
-            
+
             responses.append(EngineResponse(
                 speaker='system',
                 text=f"❌ Error from {agent_name.replace('_', ' ').title()}: {type(e).__name__}: {str(e)}",

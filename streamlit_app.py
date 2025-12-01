@@ -383,6 +383,28 @@ with st.expander("🔧 Debug Panel", expanded=False):
         st.metric("Messages", st.session_state.message_count)
     with col4:
         st.metric("API Key", "✅" if os.getenv("GOOGLE_API_KEY") else "❌")
+
+    # Engine status
+    st.markdown("### 🔧 Engine Status")
+    has_debug = hasattr(st.session_state.engine, 'get_debug_logs')
+    has_reset = hasattr(st.session_state.engine, 'reset_session')
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Debug Available", "✅" if has_debug else "❌")
+    with col2:
+        st.metric("Reset Available", "✅" if has_reset else "❌")
+    with col3:
+        if st.button("🔄 Force Refresh", use_container_width=True, help="Force reload the engine if it's outdated"):
+            # Clear the engine cache and reinitialize
+            get_simulation_engine.clear()
+            st.session_state.engine = get_simulation_engine(ENGINE_VERSION)
+            st.success("Engine refreshed! Refreshing page...")
+            st.rerun()
+
+    if not has_debug or not has_reset:
+        st.warning("⚠️ Engine may be outdated. Use the 'Force Refresh' button or clear cache.")
+        st.info("**Alternative:** Click hamburger menu (☰) → 'Clear cache' → 'Rerun'")
     
     st.divider()
     
@@ -399,7 +421,12 @@ with st.expander("🔧 Debug Panel", expanded=False):
     
     # Get and display logs
     try:
-        logs = st.session_state.engine.get_debug_logs(limit=log_limit)
+        if not hasattr(st.session_state.engine, 'get_debug_logs'):
+            st.error("⚠️ Debug panel not available. Please refresh the page to update the engine.")
+            st.info("**To fix:** Click the hamburger menu (☰) → 'Clear cache' → 'Rerun'")
+            logs = []
+        else:
+            logs = st.session_state.engine.get_debug_logs(limit=log_limit)
         
         if logs:
             for log in reversed(logs):  # Most recent first
