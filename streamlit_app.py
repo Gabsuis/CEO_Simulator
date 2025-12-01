@@ -60,6 +60,69 @@ def get_character_avatar(character_name):
     }
     return avatars.get(character_name.lower(), "🤖")
 
+@st.dialog("Character Introduction")
+def show_character_modal(character_id):
+    """Show character introduction in a modal dialog"""
+    try:
+        from engine.character_loader import CharacterLoader
+        loader = CharacterLoader()
+        char_spec = loader.load_character(normalize_character_key(character_id))
+
+        # Mark as selected when modal is shown
+        st.session_state.selected_characters.add(character_id)
+
+        # Display character introduction in modal
+        identity = char_spec.get_identity()
+
+        # Character portrait
+        image_path = get_character_image_path(character_id)
+        try:
+            col1, col2 = st.columns([1, 2])
+            with col1:
+                st.image(image_path, width=120, use_column_width=False)
+            with col2:
+                st.markdown("### " + identity.get('name', character_id.title()))
+        except:
+            st.markdown(f"<div style='font-size: 60px; text-align: center; margin: 20px 0;'>{get_character_avatar(character_id)}</div>", unsafe_allow_html=True)
+            st.markdown("### " + identity.get('name', character_id.title()))
+
+        # Title and tagline
+        st.markdown(f"**{identity.get('in_world_title', 'AI Agent')}**")
+        st.markdown(f"*{identity.get('tagline', 'AI assistant')}*")
+
+        st.divider()
+
+        # Personality traits
+        personality = char_spec.spec_data.get('personality', {})
+        if 'traits' in personality and personality['traits']:
+            st.markdown("**🔍 Key Personality Traits:**")
+            for trait in personality['traits'][:3]:
+                st.markdown(f"• {trait}")
+
+        # Quick backstory
+        if 'backstory' in identity:
+            with st.expander("📖 Quick Background"):
+                st.markdown(identity['backstory'])
+
+        # Action buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("💬 Start Conversation", use_container_width=True, type="primary"):
+                st.session_state.current_agent = character_id
+                st.session_state.show_character_modal = None
+                st.rerun()
+
+        with col2:
+            if st.button("❌ Close", use_container_width=True):
+                st.session_state.show_character_modal = None
+                st.rerun()
+
+    except Exception as e:
+        st.error(f"Could not load character introduction: {e}")
+        if st.button("❌ Close", use_container_width=True):
+            st.session_state.show_character_modal = None
+            st.rerun()
+
 def show_character_introduction(character_name, character_spec):
     """Display character introduction with image and key info"""
 
@@ -321,6 +384,9 @@ if "message_count" not in st.session_state:
 
 if "selected_characters" not in st.session_state:
     st.session_state.selected_characters = set()  # Track which characters have been selected
+
+if "show_character_modal" not in st.session_state:
+    st.session_state.show_character_modal = None  # Track which character modal to show
 
 # ============================================================================
 # SIDEBAR - AGENT SELECTION & INFO
@@ -690,16 +756,27 @@ if not st.session_state.messages:
         col_idx = i % 3
         with cols[col_idx]:
             is_selected = char["id"] == st.session_state.current_agent
-            selected_class = "selected" if is_selected else ""
+            is_new = char["id"] not in st.session_state.selected_characters
 
-            st.markdown(f"""
-            <div class="character-card {selected_class}">
-                <div style="font-size: 48px; margin-bottom: 12px;">{char["emoji"]}</div>
-                <h4 style="margin: 8px 0; color: #333;">{char["name"]}</h4>
-                <p style="font-size: 14px; color: #667eea; margin: 4px 0; font-weight: bold;">{char["title"]}</p>
-                <p style="font-size: 13px; color: #666; margin: 8px 0 0 0;">{char["desc"]}</p>
-            </div>
-            """, unsafe_allow_html=True)
+            # Create button with conditional styling
+            button_label = f"{char['emoji']} {char['name']}"
+            if is_new:
+                button_label = f"🆕 {button_label}"
+
+            button_type = "primary" if is_selected else "secondary"
+
+            if st.button(
+                button_label,
+                use_container_width=True,
+                type=button_type,
+                help=f"Meet {char['name']} - {char['title']}"
+            ):
+                st.session_state.show_character_modal = char["id"]
+                st.rerun()
+
+            # Show title and description below button
+            st.markdown(f"**{char['title']}**")
+            st.caption(char['desc'])
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -711,6 +788,10 @@ if not st.session_state.messages:
     - **Start with Sarai** to get oriented, then dive deep with specialists
     - **Characters remember** context from your entire conversation
     """)
+
+    # Trigger modal if requested
+    if st.session_state.show_character_modal:
+        show_character_modal(st.session_state.show_character_modal)
 
 # ============================================================================
 # DEBUG PANEL
