@@ -26,7 +26,7 @@ from Documents.services.document_service import get_document_service
 # Gemini 3 Pro configuration for intelligent reasoning
 GEMINI_3_MODEL = "gemini-3-pro-preview"  # Latest model with advanced reasoning
 GEMINI_3_CONFIG = types.GenerateContentConfig(
-    thinking_level="high",  # Enable deep reasoning for complex tasks
+    thinking_level="low",  # Use low reasoning for stability - minimize latency/costs
     # Remove explicit temperature - let Gemini 3 use optimized default (1.0)
     top_p=0.95,
     max_output_tokens=2048,
