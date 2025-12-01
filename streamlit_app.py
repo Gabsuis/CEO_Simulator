@@ -112,7 +112,7 @@ if "user_id" not in st.session_state:
     st.session_state.user_id = f"streamlit_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
 if "session_id" not in st.session_state:
-    st.session_state.session_id = "streamlit_session"
+    st.session_state.session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
 if "message_count" not in st.session_state:
     st.session_state.message_count = 0
@@ -176,6 +176,14 @@ with st.sidebar:
     col1, col2 = st.columns(2)
     with col1:
         if st.button("🔄 Clear Chat", use_container_width=True):
+            # Reset the ADK session state in the engine
+            st.session_state.engine.reset_session(
+                user_id=st.session_state.user_id,
+                session_id=st.session_state.session_id
+            )
+            # Generate new session ID to ensure fresh start
+            st.session_state.session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            # Clear UI state
             st.session_state.messages = []
             st.session_state.message_count = 0
             st.rerun()

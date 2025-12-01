@@ -504,6 +504,36 @@ ALL-KNOWING SESSION HISTORY ({total_messages} messages across all sessions)
                 tiers[tier].append(agent)
         
         return tiers
+    
+    def reset_session(self, user_id: str, session_id: str) -> None:
+        """
+        Reset all session data for a user/session combination.
+        
+        This clears:
+        - All conversation history for Sarai's all-knowing view
+        - Recreates the session service to clear ADK session state
+        
+        Args:
+            user_id: User identifier
+            session_id: Base session ID
+        """
+        print(f"🔄 Resetting session for user={user_id}, session={session_id}")
+        
+        # Clear conversation history for all session tiers
+        session_suffixes = ['', '_shared', '_vc', '_coach', '_therapist1', '_therapist2', '_therapist3']
+        for suffix in session_suffixes:
+            full_session_id = f"{session_id}{suffix}"
+            if full_session_id in self.conversation_history:
+                del self.conversation_history[full_session_id]
+                print(f"   Cleared history for: {full_session_id}")
+        
+        # Reset the session service (creates fresh in-memory storage)
+        self.session_service = InMemorySessionService()
+        
+        # Recreate runners with the new session service
+        self.runners = self._create_runners()
+        
+        print("✅ Session reset complete")
 
 
 # ============================================================================
