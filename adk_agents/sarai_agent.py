@@ -27,15 +27,15 @@ from google.genai import types
 
 from Documents.services.document_service import get_document_service
 
-# Sarai uses Gemini 3 Pro for intelligent orchestration
-SARAI_MODEL = "gemini-3-pro-preview"
+# Sarai uses Gemini 2.5 Flash with thinking for intelligent orchestration
+SARAI_MODEL = "gemini-2.5-flash"
 SARAI_GENERATION_CONFIG = types.GenerateContentConfig(
-    thinking_level="high",  # Deep reasoning for complex orchestration
-    # Remove explicit temperature - let Gemini 3 optimize
+    # Enable thinking for complex orchestration tasks
+    thinking_config=types.ThinkingConfig(
+        thinking_budget=1024  # Allow thinking tokens for better reasoning
+    ),
     top_p=0.95,
-    max_output_tokens=2048,
-    # High resolution for document processing
-    media_resolution="high",
+    max_output_tokens=4096,
 )
 from adk_agents.scene_context import get_scene_context
 from engine import get_character_loader
