@@ -23,20 +23,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from google.adk.agents import LlmAgent
 from google.adk.tools import FunctionTool, ToolContext
-from google.genai import types
 
 from Documents.services.document_service import get_document_service
 
-# Sarai uses Gemini 2.5 Flash with thinking for intelligent orchestration
+# Sarai uses Gemini 2.5 Flash for intelligent orchestration
 SARAI_MODEL = "gemini-2.5-flash"
-SARAI_GENERATION_CONFIG = types.GenerateContentConfig(
-    # Enable thinking for complex orchestration tasks
-    thinking_config=types.ThinkingConfig(
-        thinking_budget=1024  # Allow thinking tokens for better reasoning
-    ),
-    top_p=0.95,
-    max_output_tokens=4096,
-)
 from adk_agents.scene_context import get_scene_context
 from engine import get_character_loader
 
@@ -297,7 +288,6 @@ IMPORTANT:
     agent = LlmAgent(
         name="sarai",
         model=SARAI_MODEL,
-        generate_content_config=SARAI_GENERATION_CONFIG,
         description=identity.get('tagline', 'Sarai - Meta-orchestrator'),
         instruction=instruction,
         tools=[
