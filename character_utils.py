@@ -45,3 +45,4 @@ def get_character_avatar(character_name: str) -> str:
     """Return an emoji avatar for a character."""
     return CHARACTER_AVATARS.get(character_name.lower(), "🤖")
 
+
