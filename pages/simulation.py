@@ -37,13 +37,13 @@ def render_top_nav():
     with st.container():
         col1, col2 = st.columns([1, 1])
         with col1:
-            st.page_link("streamlit_app.py", label="🏠 Welcome", icon="🏠")
+            if st.button("🏠 Welcome", use_container_width=True):
+                st.switch_page("streamlit_app.py")
         with col2:
-            st.page_link(
-                "pages/simulation.py",
-                label="🎮 Simulation",
-                icon="💬",
+            st.button(
+                "🎮 Simulation",
                 disabled=True,
+                use_container_width=True,
             )
 
 

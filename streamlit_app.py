@@ -94,12 +94,15 @@ def render_top_nav(active: str):
     with nav:
         col1, col2 = st.columns([1, 1])
         with col1:
-            st.page_link(
-                "streamlit_app.py",
-                label="🏠 Welcome",
-                icon="🏠",
-                disabled=active == "welcome",
-            )
+            if active == "welcome":
+                st.button(
+                    "🏠 Welcome",
+                    disabled=True,
+                    use_container_width=True,
+                )
+            else:
+                if st.button("🏠 Welcome", use_container_width=True):
+                    st.switch_page("streamlit_app.py")
         with col2:
             st.page_link(
                 "pages/simulation.py",
