@@ -28,18 +28,42 @@ initialize_session_state()
 ensure_api_key()
 
 st.markdown(BASE_CSS, unsafe_allow_html=True)
-st.markdown(
-    """
-    <style>
-        [data-testid="stSidebar"] {display: none;}
-        [data-testid="collapsedControl"] {display: none;}
-        .welcome-body {max-width: 900px; margin: 0 auto;}
-        .welcome-body h2, .welcome-body h3 {text-align: center;}
-        .welcome-body p {text-align: justify;}
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+
+# Page navigation state
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "welcome"
+
+# Page navigation header
+col1, col2 = st.columns([1, 1])
+with col1:
+    if st.session_state.current_page == "welcome":
+        st.button("🏠 Welcome", disabled=True, width='stretch')
+    else:
+        if st.button("🏠 Welcome", width='stretch'):
+            st.session_state.current_page = "welcome"
+            st.rerun()
+with col2:
+    if st.session_state.current_page == "simulation":
+        st.button("🎮 Simulation", disabled=True, width='stretch')
+    else:
+        if st.button("🎮 Simulation", width='stretch'):
+            st.session_state.current_page = "simulation"
+            st.rerun()
+
+# Page content rendering
+if st.session_state.current_page == "welcome":
+    st.markdown(
+        """
+        <style>
+            [data-testid="stSidebar"] {display: none;}
+            [data-testid="collapsedControl"] {display: none;}
+            .welcome-body {max-width: 900px; margin: 0 auto;}
+            .welcome-body h2, .welcome-body h3 {text-align: center;}
+            .welcome-body p {text-align: justify;}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 DEFAULT_BACKSTORIES = {
@@ -154,7 +178,8 @@ if st.button(
 ):
     st.session_state.show_character_modal = None
     st.session_state.show_character_modal_source = None
-    st.switch_page("simulation")
+    st.session_state.current_page = "simulation"
+    st.rerun()
 if not has_met_character:
     st.caption("Meet a character first to unlock the simulation.")
 
@@ -251,3 +276,11 @@ if (
     and st.session_state.show_character_modal_source == "welcome"
 ):
     show_character_modal(st.session_state.show_character_modal)
+
+else:  # Simulation page
+    # Simulation page content will go here
+    st.markdown("## 🎮 Simulation Page")
+    st.write("Chat functionality coming soon...")
+
+    # For now, just show a placeholder
+    # TODO: Add full simulation page content
