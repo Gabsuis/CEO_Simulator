@@ -112,33 +112,6 @@ def show_character_modal(character_id: str):
         st.error(f"Could not load character introduction: {exc}")
 
 
-def render_top_nav(active: str):
-    """Render top navigation tabs."""
-    nav = st.container()
-    with nav:
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            if active == "welcome":
-                st.button(
-                    "🏠 Welcome",
-                    disabled=True,
-                    width='stretch',
-                )
-            else:
-                if st.button("🏠 Welcome", width='stretch'):
-                    st.switch_page("streamlit_app.py")
-        with col2:
-            if active == "simulation":
-                st.button(
-                    "🎮 Simulation",
-                    disabled=True,
-                    width='stretch',
-                )
-            else:
-                if st.button("🎮 Simulation", width='stretch'):
-                    st.switch_page("pages/simulation.py")
-
-
 def render_character_grid(characters):
     """Show the character cards with CTA buttons."""
     cols = st.columns(3)
@@ -156,8 +129,6 @@ def render_character_grid(characters):
                 st.session_state.show_character_modal_source = "welcome"
                 st.rerun()
 
-
-render_top_nav("welcome")
 
 st.markdown("<div class='welcome-body'>", unsafe_allow_html=True)
 st.markdown("## 🎮 Welcome to CEO Simulator")
