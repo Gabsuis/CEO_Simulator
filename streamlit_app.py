@@ -112,7 +112,7 @@ def render_top_nav(active: str):
                 )
             else:
                 if st.button("🎮 Simulation", width='stretch'):
-                    st.switch_page("simulation")
+                    st.switch_page("pages/simulation.py")
 
 
 def render_character_grid(characters):
