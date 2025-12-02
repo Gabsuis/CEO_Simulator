@@ -1,944 +1,247 @@
+
 """
-CEO Simulator - Streamlit Web Interface
+CEO Simulator - Streamlit Web Interface (Welcome Page)
 
 Deploy to Streamlit Cloud: https://share.streamlit.io/
 Local: streamlit run streamlit_app.py
 """
 
 import streamlit as st
-import asyncio
-import os
-import sys
-from pathlib import Path
-from datetime import datetime
-from dotenv import load_dotenv
-import time
 
-# Load environment variables
-load_dotenv()
-
-# Add project to path
-sys.path.insert(0, str(Path(__file__).parent))
-
-# ============================================================================
-# CHARACTER INTRODUCTION HELPERS
-# ============================================================================
-
-def get_character_image_path(character_name):
-    """Get the path to character image"""
-    image_map = {
-        "sarai": "sarai.png",
-        "tech_cofounder": "tech_cofounder.png",
-        "advisor": "advisor.png",
-        "marketing_cofounder": "marketing_cofounder.png",
-        "vc": "vc.png",
-        "coach": "coach.png",
-        "therapist_1": "therapist_analytical.png",
-        "therapist_2": "therapist_empathic.png",
-        "therapist_3": "therapist_skeptical.png"
-    }
-    return f"Documents/assets/characters/{image_map.get(character_name, 'sarai.png')}"
-
-def normalize_character_key(character_name):
-    """Normalize character names for tracking"""
-    if character_name.startswith('therapist_'):
-        return 'therapist_customers'  # All therapists share the same base spec
-    return character_name.lower().replace(' ', '_')
-
-def get_character_avatar(character_name):
-    """Get avatar URL or emoji for character"""
-    avatars = {
-        "sarai": "🧠",
-        "tech_cofounder": "👨‍💻",
-        "advisor": "🎯",
-        "marketing_cofounder": "📈",
-        "vc": "💰",
-        "coach": "🏆",
-        "therapist_1": "👥",
-        "therapist_2": "👥",
-        "therapist_3": "👥"
-    }
-    return avatars.get(character_name.lower(), "🤖")
-
-@st.dialog("Character Introduction", width="large")
-def show_character_modal(character_id):
-    """Show character introduction in a large modal dialog"""
-    try:
-        from engine.character_loader import CharacterLoader
-        loader = CharacterLoader()
-        char_spec = loader.load_character(normalize_character_key(character_id))
-
-        # Mark as selected when modal is shown
-        st.session_state.selected_characters.add(character_id)
-
-        # Display character introduction in modal
-        identity = char_spec.get_identity()
-
-        # Character portrait - LARGER
-        image_path = get_character_image_path(character_id)
-        try:
-            col1, col2 = st.columns([1, 2])
-            with col1:
-                st.image(image_path, width=200, use_column_width=False)  # Increased from 120 to 200
-            with col2:
-                st.markdown("## " + identity.get('name', character_id.title()))  # Changed to h2 for larger text
-                st.markdown(f"**{identity.get('in_world_title', 'AI Agent')}**")
-                st.markdown(f"*{identity.get('tagline', 'AI assistant')}*")
-        except:
-            st.markdown(f"<div style='font-size: 80px; text-align: center; margin: 30px 0;'>{get_character_avatar(character_id)}</div>", unsafe_allow_html=True)  # Increased from 60 to 80
-            st.markdown("## " + identity.get('name', character_id.title()))
-            st.markdown(f"**{identity.get('in_world_title', 'AI Agent')}**")
-            st.markdown(f"*{identity.get('tagline', 'AI assistant')}*")
-
-        st.divider()
-
-        # Personality traits - better formatted
-        personality = char_spec.spec_data.get('personality', {})
-        if 'traits' in personality and personality['traits']:
-            st.markdown("### 🔍 Key Personality Traits")
-            for trait in personality['traits'][:4]:  # Increased from 3 to 4 traits
-                st.markdown(f"• {trait}")
-            st.markdown("")  # Add spacing
-
-        # Quick backstory - expanded by default for larger modal
-        if 'backstory' in identity:
-            with st.expander("📖 Quick Background", expanded=True):  # Expanded by default
-                st.markdown(identity['backstory'])
-
-        st.markdown("")  # Add spacing
-
-        # Action buttons - larger and more prominent
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            if st.button("💬 Start Conversation", use_container_width=True, type="primary", help="Switch to this character and start chatting"):
-                st.session_state.current_agent = character_id
-                st.session_state.show_character_modal = None
-                st.rerun()
-
-        with col2:
-            if st.button("❌ Close", use_container_width=True, help="Close this introduction"):
-                st.session_state.show_character_modal = None
-                st.rerun()
-
-    except Exception as e:
-        st.error(f"Could not load character introduction: {e}")
-        if st.button("❌ Close", use_container_width=True):
-            st.session_state.show_character_modal = None
-            st.rerun()
-
-def show_character_introduction(character_name, character_spec):
-    """Display character introduction with image and key info"""
-
-    # Load character image
-    image_path = get_character_image_path(character_name)
-    try:
-        col1, col2 = st.columns([1, 2])
-        with col1:
-            st.image(image_path, width=150, use_column_width=False)
-        with col2:
-            st.markdown("---")
-    except:
-        # Fallback emoji if image fails
-        emoji_map = {
-            "sarai": "🧠", "tech_cofounder": "👨‍💻", "advisor": "🎯",
-            "marketing_cofounder": "📈", "vc": "💰", "coach": "🏆"
-        }
-        st.markdown(f"<div style='font-size: 80px; text-align: center; margin: 20px 0;'>{emoji_map.get(character_name, '🤖')}</div>", unsafe_allow_html=True)
-
-    # Character info card
-    identity = character_spec.get_identity()
-    st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin: 10px 0;">
-        <h2 style="margin-top: 0;">{identity.get('name', character_name.title())}</h2>
-        <h3 style="opacity: 0.9; margin-bottom: 15px;">{identity.get('in_world_title', 'AI Agent')}</h3>
-        <p style="font-style: italic; margin-bottom: 15px;">"{identity.get('tagline', 'AI assistant')}"</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Personality traits
-    personality = character_spec.spec_data.get('personality', {})
-    if 'traits' in personality and personality['traits']:
-        with st.expander("🔍 Key Personality Traits", expanded=True):
-            for trait in personality['traits'][:3]:  # Show top 3
-                st.markdown(f"• {trait}")
-
-    # Quick backstory
-    if 'backstory' in identity:
-        with st.expander("📖 Quick Background", expanded=False):
-            st.markdown(identity['backstory'])
-
-    st.markdown("---")
-    st.info("💡 **Pro tip:** This character only appears once per session. Get to know them!")
-
-# ============================================================================
-# PAGE CONFIG
-# ============================================================================
+from app_state import ensure_api_key, initialize_session_state
+from app_styles import BASE_CSS
+from character_utils import (
+    get_character_avatar,
+    get_character_image_path,
+    normalize_character_key,
+)
 
 st.set_page_config(
     page_title="CEO Simulator",
     page_icon="🎮",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed",
 )
 
-# Custom CSS - Enhanced for Dream UI
-st.markdown("""
-<style>
-    .header {
-        text-align: center;
-        padding: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-    .agent-badge {
-        display: inline-block;
-        padding: 8px 16px;
-        border-radius: 20px;
-        background: #667eea;
-        color: white;
-        font-weight: bold;
-        margin: 5px 5px 5px 0;
-    }
-    /* Floating session dashboard */
-    .floating-dashboard {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        border-radius: 12px;
-        padding: 12px 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        z-index: 1000;
-        font-size: 12px;
-        min-width: 200px;
-    }
-    .floating-dashboard h4 {
-        margin: 0 0 8px 0;
-        font-size: 14px;
-        color: #667eea;
-    }
-    .floating-dashboard .metric-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 4px;
-        font-size: 11px;
-    }
-    .floating-dashboard .metric-label {
-        color: #666;
-    }
-    .floating-dashboard .metric-value {
-        color: #333;
-        font-weight: bold;
-    }
+# Ensure shared session state and API key are available
+initialize_session_state()
+ensure_api_key()
 
-    /* Enhanced Message Styling */
-    .chat-message {
-        padding: 16px;
-        border-radius: 12px;
-        margin: 12px 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-    }
-    .chat-message:hover {
-        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    }
-    .message-user {
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        border-left: 4px solid #2196F3;
-        margin-left: 20px;
-        margin-right: 60px;
-    }
-    .message-assistant {
-        background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
-        border-left: 4px solid #667eea;
-        margin-right: 20px;
-        margin-left: 60px;
-    }
-
-    /* Avatar Styling */
-    .agent-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        margin-right: 16px;
-        border: 3px solid #667eea;
-        object-fit: cover;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        transition: all 0.3s ease;
-    }
-    .agent-avatar:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-    }
-
-    /* Typing Indicator */
-    .message-typing {
-        animation: typing 1.5s infinite;
-        display: inline-block;
-    }
-    @keyframes typing {
-        0%, 60%, 100% { opacity: 1; }
-        30% { opacity: 0.3; }
-    }
-
-    /* Dream UI Elements */
-    .dream-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border-radius: 16px;
-        padding: 20px;
-        margin: 12px 0;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        border: 1px solid rgba(102, 126, 234, 0.1);
-    }
-    .dream-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 24px;
-        border-radius: 16px;
-        margin-bottom: 24px;
-        text-align: center;
-    }
-    .character-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-        margin: 20px 0;
-    }
-    .character-card {
-        background: white;
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-        text-align: center;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-    }
-    .character-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    }
-    .character-card.selected {
-        border-color: #667eea;
-        background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
-    }
-
-    /* Scene Elements */
-    .scene-banner {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-        padding: 20px;
-        border-radius: 12px;
-        margin: 16px 0;
-        text-align: center;
-    }
-
-    /* Meeting Panel Styling */
-    .meeting-panel {
-        background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
-        border-radius: 16px;
-        padding: 20px;
-        margin: 16px 0;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# ============================================================================
-# CHECK API KEY
-# ============================================================================
-
-if not os.getenv("GOOGLE_API_KEY"):
-    st.error("❌ API Key not found!")
-    st.info("""
-    ### Setup Instructions:
-    
-    **Local Development:**
-    1. Create `.streamlit/secrets.toml`
-    2. Add: `GOOGLE_API_KEY = "your-key-here"`
-    3. Restart the app
-    
-    **Streamlit Cloud:**
-    1. Deploy your repo to GitHub
-    2. Go to app settings → Secrets
-    3. Add your `GOOGLE_API_KEY`
-    """)
-    st.stop()
-
-# ============================================================================
-# INITIALIZE SESSION STATE
-# ============================================================================
-
-# Engine version - increment this to force cache refresh when engine code changes
-ENGINE_VERSION = "2.0"
-
-@st.cache_resource
-def get_simulation_engine(_version: str):
-    """Initialize simulation engine (cached across reruns).
-    
-    The _version parameter forces cache invalidation when we update the engine.
+st.markdown(BASE_CSS, unsafe_allow_html=True)
+st.markdown(
     """
-    from simulation_engine_adk import SimulationEngine
-    return SimulationEngine()
+    <style>
+        [data-testid="stSidebar"] {display: none;}
+        [data-testid="collapsedControl"] {display: none;}
+        .welcome-body {max-width: 900px; margin: 0 auto;}
+        .welcome-body h2, .welcome-body h3 {text-align: center;}
+        .welcome-body p {text-align: justify;}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-# Initialize session state
-if "engine" not in st.session_state:
-    st.session_state.engine = get_simulation_engine(ENGINE_VERSION)
 
-# Check if engine needs refresh (version mismatch or missing new methods)
-if not hasattr(st.session_state.engine, 'get_debug_logs'):
-    # Clear the cache and reinitialize
-    get_simulation_engine.clear()
-    st.session_state.engine = get_simulation_engine(ENGINE_VERSION)
+DEFAULT_BACKSTORIES = {
+    "sarai": "Can do all, evaluates you, and sees every thread."
+}
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 
-if "current_agent" not in st.session_state:
-    agents = [a['name'] for a in st.session_state.engine.list_agents()]
-    st.session_state.current_agent = "sarai"
-
-if "user_id" not in st.session_state:
-    st.session_state.user_id = f"streamlit_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-
-if "session_id" not in st.session_state:
-    st.session_state.session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-
-if "message_count" not in st.session_state:
-    st.session_state.message_count = 0
-
-if "selected_characters" not in st.session_state:
-    st.session_state.selected_characters = set()  # Track which characters have been selected
-
-if "show_character_modal" not in st.session_state:
-    st.session_state.show_character_modal = None  # Track which character modal to show
-
-# ============================================================================
-# SIDEBAR - AGENT SELECTION & INFO
-# ============================================================================
-
-with st.sidebar:
-    st.markdown("### 🎮 CEO Simulator")
-    st.divider()
-    
-    # Agent selection
-    agents = [a['name'] for a in st.session_state.engine.list_agents()]
-
-    # Create display names with new character indicators
-    agent_display = []
-    agent_map = {}  # Map display name back to agent ID
-
-    for agent in agents:
-        agent_title = agent.replace('_', ' ').title()
-        is_new = agent not in st.session_state.selected_characters
-        display_name = f"🆕 {agent_title}" if is_new else f"👤 {agent_title}"
-        agent_display.append(display_name)
-        agent_map[display_name] = agent
-
-    # Find current agent's display name in the list
-    current_agent_title = st.session_state.current_agent.replace('_', ' ').title()
-    current_is_new = st.session_state.current_agent not in st.session_state.selected_characters
-    current_display = f"🆕 {current_agent_title}" if current_is_new else f"👤 {current_agent_title}"
-
-    # Find the index, default to 0 if not found (shouldn't happen but safety check)
+@st.dialog("Character Introduction", width="large")
+def show_character_modal(character_id: str):
+    """Display a full character brief in a modal."""
     try:
-        selected_idx = agent_display.index(current_display)
-    except ValueError:
-        selected_idx = 0  # Default to first agent if current not found
+        from engine.character_loader import CharacterLoader
 
-    selected_display = st.selectbox(
-        "Select Character",
-        agent_display,
-        index=selected_idx,
-        key="agent_selector"
-    )
+        loader = CharacterLoader()
+        char_spec = loader.load_character(normalize_character_key(character_id))
+        st.session_state.selected_characters.add(character_id)
 
-    # Get the actual agent name from the map
-    selected_agent_name = agent_map.get(selected_display, agents[0])
-    
-    # Check if this is a new character selection
-    previous_agent = st.session_state.get('current_agent', None)
-    st.session_state.current_agent = selected_agent_name
+        identity = char_spec.get_identity()
+        image_path = get_character_image_path(character_id)
 
-    # Show introduction for newly selected characters
-    if st.session_state.current_agent != previous_agent and st.session_state.current_agent not in st.session_state.selected_characters:
-        try:
-            from engine.character_loader import CharacterLoader
-            loader = CharacterLoader()
-            char_spec = loader.load_character(normalize_character_key(st.session_state.current_agent))
+        # Centered portrait
+        left, center, right = st.columns([1, 2, 1])
+        with center:
+            try:
+                st.image(image_path, use_container_width=True)
+            except Exception:
+                st.markdown(
+                    f"<div style='font-size: 96px; text-align: center; margin: 30px 0;'>{get_character_avatar(character_id)}</div>",
+                    unsafe_allow_html=True,
+                )
 
-            st.markdown("---")
-            show_character_introduction(st.session_state.current_agent, char_spec)
-            st.markdown("---")
+        st.markdown(
+            f"## {identity.get('name', character_id.title())}\n"
+            f"**{identity.get('in_world_title', 'AI Agent')}**\n\n"
+            f"*{identity.get('tagline', 'Guides the CEO')}*"
+        )
 
-            # Mark as selected
-            st.session_state.selected_characters.add(st.session_state.current_agent)
+        st.divider()
 
-        except Exception as e:
-            st.warning(f"Could not load character introduction: {e}")
+        backstory = identity.get("backstory") or DEFAULT_BACKSTORIES.get(
+            character_id, "Details coming soon."
+        )
+        with st.expander("📖 Quick Background", expanded=True):
+            st.markdown(backstory)
+    except Exception as exc:
+        st.error(f"Could not load character introduction: {exc}")
 
-    st.divider()
-    
-    # Quick Character Actions
-    st.markdown("---")
-    st.markdown("**⚡ Quick Switches**")
-    quick_chars = ["sarai", "tech_cofounder", "advisor", "vc"]
-    for char in quick_chars:
-        if char != st.session_state.current_agent:
-            char_title = char.replace('_', ' ').title()
-            if st.button(f"→ {char_title}", key=f"quick_{char}", use_container_width=True, help=f"Quick switch to {char_title}"):
-                st.session_state.current_agent = char
-                st.session_state.selected_characters.add(char)  # Mark as selected
-                st.rerun()
-    
-    # Character description (if available)
-    st.markdown("---")
-    st.markdown("**ℹ️ About This Character**")
-    
-    agent_info = {
-        "sarai": "Meta-orchestrator with access to all sessions. Routes conversations and provides evaluations.",
-        "tech_cofounder": "Pragmatic engineer. Focuses on feasibility, trade-offs, and technical reality.",
-        "advisor": "Strategic thinker. Asks probing questions and connects dots across domains.",
-        "marketing_cofounder": "Customer-obsessed marketer. Focuses on GTM and customer research.",
-        "vc": "Board-level investor. High-level strategy and market opportunity focus.",
-        "coach": "Executive coach. Leadership development and personal growth focus.",
-        "therapist_1": "Customer persona 1. Real-world user feedback and pain points.",
-        "therapist_2": "Customer persona 2. Real-world user feedback and pain points.",
-        "therapist_3": "Customer persona 3. Real-world user feedback and pain points.",
-    }
-    
-    description = agent_info.get(st.session_state.current_agent, "AI agent")
-    st.markdown(f"> {description}")
-    
-    # Controls
-    st.divider()
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🔄 Clear Chat", use_container_width=True):
-            # Reset the ADK session state in the engine
-            st.session_state.engine.reset_session(
-                user_id=st.session_state.user_id,
-                session_id=st.session_state.session_id
+
+def render_top_nav(active: str):
+    """Render top navigation tabs."""
+    nav = st.container()
+    with nav:
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.page_link(
+                "streamlit_app.py",
+                label="🏠 Welcome",
+                icon="🏠",
+                disabled=active == "welcome",
             )
-            # Generate new session ID to ensure fresh start
-            st.session_state.session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-            # Clear UI state
-            st.session_state.messages = []
-            st.session_state.message_count = 0
-            st.session_state.selected_characters = set()  # Reset selections
-            st.rerun()
-    with col2:
-        # Generate transcript for download
-        if st.session_state.messages:
-            transcript_lines = [
-                "=" * 60,
-                "CEO SIMULATOR - CHAT TRANSCRIPT",
-                f"Exported: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                "=" * 60,
-                ""
-            ]
-            for msg in st.session_state.messages:
-                if msg["role"] == "user":
-                    transcript_lines.append(f"You: {msg['content']}")
-                else:
-                    transcript_lines.append(f"{msg['agent']}: {msg['content']}")
-                transcript_lines.append("")
-            transcript_lines.append("=" * 60)
-            transcript_text = "\n".join(transcript_lines)
-            
-            st.download_button(
-                label="📥 Export",
-                data=transcript_text,
-                file_name=f"ceo_sim_transcript_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
-                mime="text/plain",
-                use_container_width=True
+        with col2:
+            st.page_link(
+                "pages/simulation.py",
+                label="🎮 Simulation",
+                icon="💬",
+                disabled=active == "simulation",
             )
-        else:
-            st.button("📥 Export", use_container_width=True, disabled=True)
-    
-    # Footer
-    st.divider()
-    st.markdown("""
-    <div style="text-align: center; color: #999; font-size: 12px;">
-    Made with 🎨 Streamlit<br>
-    Powered by 🧠 Google Gemini
-    </div>
-    """, unsafe_allow_html=True)
 
-# ============================================================================
-# EMPTY STATE - Show welcome screen when no messages
-# ============================================================================
 
-if not st.session_state.messages:
-    # Dream UI Welcome Experience - Fixed HTML rendering
-
-    # Title and description
-    st.markdown("## 🎮 Welcome to CEO Simulator")
-    st.markdown("*Step into the shoes of a CEO and navigate complex business challenges with your expert team*")
-
-    # Current scenario box
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); padding: 16px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #f39c12;">
-        <h4 style="color: #d68910; margin-top: 0;">📊 Current Scenario</h4>
-        <p style="margin-bottom: 0; color: #8b4513;"><strong>Mentalyc</strong> - AI therapy platform | <strong>Runway:</strong> 2.4 months | <strong>Challenge:</strong> First 30 days as CEO</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Team section header
-    st.markdown("### 👥 Meet Your Team")
-    st.markdown("Click on any character to get introduced and start a conversation. Each brings unique expertise to help you succeed.")
-
-    # Character Grid - Dream UI Style
-    st.markdown('<div class="character-grid">', unsafe_allow_html=True)
-
-    characters_info = [
-        {"id": "sarai", "name": "Sarai", "emoji": "🧠", "title": "Meta-Orchestrator", "desc": "All-knowing guide & conversation router"},
-        {"id": "tech_cofounder", "name": "Omer", "emoji": "👨‍💻", "title": "CTO/Co-founder", "desc": "Technical reality & engineering constraints"},
-        {"id": "advisor", "name": "Strategy Advisor", "emoji": "🎯", "title": "Strategic Advisor", "desc": "Business strategy & market focus"},
-        {"id": "marketing_cofounder", "name": "Marketing Co-founder", "emoji": "📈", "title": "Head of Marketing", "desc": "GTM strategy & customer acquisition"},
-        {"id": "vc", "name": "VC Investor", "emoji": "💰", "title": "Lead Investor", "desc": "Fundraising & market opportunity"},
-        {"id": "coach", "name": "Leadership Coach", "emoji": "🏆", "title": "Executive Coach", "desc": "Leadership & personal growth"},
-    ]
-
+def render_character_grid(characters):
+    """Show the character cards with CTA buttons."""
     cols = st.columns(3)
-    for i, char in enumerate(characters_info):
-        col_idx = i % 3
-        with cols[col_idx]:
-            is_selected = char["id"] == st.session_state.current_agent
-            is_new = char["id"] not in st.session_state.selected_characters
-
-            # Create button with conditional styling
-            button_label = f"{char['emoji']} {char['name']}"
-            if is_new:
-                button_label = f"🆕 {button_label}"
-
-            button_type = "primary" if is_selected else "secondary"
-
+    for idx, char in enumerate(characters):
+        with cols[idx % 3]:
+            st.markdown(f"### {char['emoji']} {char['name']}")
+            st.caption(char["title"])
+            st.write(char["desc"])
             if st.button(
-                button_label,
+                f"Meet {char['name']}",
+                key=f"meet_{char['id']}",
                 use_container_width=True,
-                type=button_type,
-                help=f"Meet {char['name']} - {char['title']}"
             ):
                 st.session_state.show_character_modal = char["id"]
+                st.session_state.show_character_modal_source = "welcome"
                 st.rerun()
 
-            # Show title and description below button
-            st.markdown(f"**{char['title']}**")
-            st.caption(char['desc'])
 
-    st.markdown('</div>', unsafe_allow_html=True)
+render_top_nav("welcome")
 
-    # Pro Tips section
-    st.markdown("#### 💡 Pro Tips")
-    st.markdown("""
-    - **🆕 New characters** appear with glowing indicators in the sidebar
-    - **Switch anytime** - your conversation history is preserved
-    - **Start with Sarai** to get oriented, then dive deep with specialists
-    - **Characters remember** context from your entire conversation
-    """)
+st.markdown("<div class='welcome-body'>", unsafe_allow_html=True)
+st.markdown("## 🎮 Welcome to CEO Simulator")
+st.markdown(
+    "*Step into the shoes of Mentalyc's CEO and navigate tough calls with your executive team.*"
+)
 
-    # Trigger modal if requested
-    if st.session_state.show_character_modal:
-        show_character_modal(st.session_state.show_character_modal)
+has_met_character = len(st.session_state.selected_characters) > 0
+st.markdown("### 🚀 Ready to Lead?")
+st.write(
+    "Meet at least one character, then jump into the simulation whenever you're ready."
+)
+if st.button(
+    "Start Simulation",
+    type="primary",
+    use_container_width=True,
+    disabled=not has_met_character,
+):
+    st.session_state.show_character_modal = None
+    st.session_state.show_character_modal_source = None
+    st.switch_page("pages/simulation.py")
+if not has_met_character:
+    st.caption("Meet a character first to unlock the simulation.")
 
-# ============================================================================
-# MAIN CHAT AREA - Only show when there are messages
-# ============================================================================
+st.markdown(
+    """
+<div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); padding: 16px; border-radius: 12px; margin: 30px 0; border-left: 4px solid #f39c12;">
+    <h4 style="color: #d68910; margin-top: 0; text-align:center;">📊 Current Scenario</h4>
+    <p style="margin-bottom: 0; color: #8b4513;">
+        <strong>Company:</strong> Mentalyc (AI therapy platform)<br>
+        <strong>Runway:</strong> 2.4 months<br>
+        <strong>Challenge:</strong> First 30 days as CEO – stabilize, align, and make decisions fast.
+    </p>
+</div>
+""",
+    unsafe_allow_html=True,
+)
 
-else:
-    # Floating Session Dashboard
-    st.markdown(f"""
-    <div class="floating-dashboard">
-        <h4>📊 Session</h4>
-        <div class="metric-row">
-            <span class="metric-label">Messages:</span>
-            <span class="metric-value">{st.session_state.message_count}</span>
-        </div>
-        <div class="metric-row">
-            <span class="metric-label">Characters met:</span>
-            <span class="metric-value">{len(st.session_state.selected_characters)}</span>
-        </div>
-        <div class="metric-row">
-            <span class="metric-label">Current:</span>
-            <span class="metric-value">{st.session_state.current_agent.replace('_', ' ').title()}</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("### 🧭 How It Works")
+st.markdown(
+    """
+1. **Meet the Team** – Each character brings a unique perspective.
+2. **Learn the Context** – Understand Mentalyc's situation.
+3. **Start Simulation** – Switch to the Simulation page for the live chat.
+4. **Navigate Decisions** – Bounce between characters, gather insight, and lead.
+"""
+)
 
-    # Enhanced Dream UI Header
-    current_char_name = st.session_state.current_agent.replace('_', ' ').title()
-    st.markdown(f"""
-    <div class="dream-header">
-        <h1>🎮 CEO Simulator - Meeting Room</h1>
-        <h2>Currently speaking with {current_char_name}</h2>
-        <p style="opacity: 0.9; margin-bottom: 0;">Navigate complex business challenges with your expert team</p>
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("### 👥 Meet Your Team")
+st.markdown(
+    "Click any teammate to open their dossier, personality traits, and backstory."
+)
 
-# Message display area
-message_container = st.container()
+CHARACTERS = [
+    {
+        "id": "sarai",
+        "name": "Sarai",
+        "emoji": "🧠",
+        "title": "Meta-Orchestrator",
+        "desc": "Can do all, evaluates you, and sees every thread.",
+    },
+    {
+        "id": "tech_cofounder",
+        "name": "Omer",
+        "emoji": "👨‍💻",
+        "title": "Tech Cofounder",
+        "desc": "Knows the engineering realities, technical debt, and delivery constraints.",
+    },
+    {
+        "id": "advisor",
+        "name": "Strategy Advisor",
+        "emoji": "🎯",
+        "title": "Strategic Advisor",
+        "desc": "Connects market dots, pressure-tests focus, and spots blind spots.",
+    },
+    {
+        "id": "marketing_cofounder",
+        "name": "Marketing Cofounder",
+        "emoji": "📈",
+        "title": "Head of Marketing",
+        "desc": "Obsessed with GTM, ICP clarity, and customer research.",
+    },
+    {
+        "id": "vc",
+        "name": "VC Investor",
+        "emoji": "💰",
+        "title": "Lead Investor",
+        "desc": "Focuses on runway, fundraising appetite, and board-level alignment.",
+    },
+    {
+        "id": "coach",
+        "name": "Leadership Coach",
+        "emoji": "🏆",
+        "title": "Executive Coach",
+        "desc": "Helps you stay grounded, prioritize energy, and grow as a leader.",
+    },
+]
 
-with message_container:
-    # Enhanced Dream UI Meeting Panel
-    st.markdown("""
-    <div class="meeting-panel">
-        <h3 style="margin-top: 0; color: #667eea;">💬 Meeting Room</h3>
-        <p style="color: #666; margin-bottom: 16px;">Real-time conversation with your team</p>
-    </div>
-    """, unsafe_allow_html=True)
+render_character_grid(CHARACTERS)
 
-    # Display all messages with enhanced styling and avatars
-    for i, msg in enumerate(st.session_state.messages):
-        if msg["role"] == "user":
-            avatar = "👤"
-            st.markdown(f"""
-            <div class="chat-message message-user">
-                <div style="display: flex; align-items: flex-start; margin-bottom: 8px;">
-                    <div class="agent-avatar" style="background: #2196F3; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">{avatar}</div>
-                    <div style="flex: 1;">
-                        <strong style="color: #1976D2;">You</strong>
-                        <div style="color: #424242; margin-top: 4px;">{msg["content"]}</div>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            character_key = msg["agent"].lower().replace(' ', '_')
-            avatar = get_character_avatar(character_key)
+st.markdown("### 💡 Pro Tips")
+st.markdown(
+    """
+- 🧠 **Start with Sarai** for a systems view, then dive deep with specialists.
+- 🔄 **Switch characters anytime** – your transcript stays intact.
+- 🗂️ **Characters remember context** from the entire session.
+- 📝 **Use the Simulation page** for the actual conversation once you're ready.
+"""
+)
 
-            # Try to show character image if available
-            image_path = get_character_image_path(character_key)
-            avatar_html = ""
-            try:
-                # For now, use emoji avatars - could enhance to show mini character images
-                avatar_html = f'<div class="agent-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">{avatar}</div>'
-            except:
-                avatar_html = f'<div class="agent-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">{avatar}</div>'
+st.markdown("</div>", unsafe_allow_html=True)
 
-            st.markdown(f"""
-            <div class="chat-message message-assistant">
-                <div style="display: flex; align-items: flex-start; margin-bottom: 8px;">
-                    {avatar_html}
-                    <div style="flex: 1;">
-                        <strong style="color: #667eea;">{msg["agent"]}</strong>
-                        <div style="color: #424242; margin-top: 4px;">{msg["content"]}</div>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-# ============================================================================
-# CHAT INPUT
-# ============================================================================
-
-st.divider()
-
-col1, col2 = st.columns([0.85, 0.15])
-
-with col1:
-    user_input = st.chat_input(
-        f"Type your message to {st.session_state.current_agent.replace('_', ' ').title()}...",
-        key="chat_input"
-    )
-
-with col2:
-    # Quick commands
-    st.markdown("**Quick:**")
-    if st.button("Switch", use_container_width=True, key="switch_btn"):
-        st.session_state.show_agent_selector = True
-
-# ============================================================================
-# PROCESS INPUT
-# ============================================================================
-
-if user_input:
-    # Add user message to chat
-    st.session_state.messages.append({
-        "role": "user",
-        "content": user_input
-    })
-    
-    # Display user message immediately
-    st.markdown(f"""
-    <div class="chat-message message-user">
-        <strong>👤 You:</strong><br>{user_input}
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Get response from agent
-    with st.spinner(f"✨ {st.session_state.current_agent.replace('_', ' ').title()} is thinking..."):
-        try:
-            # Run async function in sync context
-            async def get_response():
-                return await st.session_state.engine.handle_input(
-                    user_id=st.session_state.user_id,
-                    session_id=st.session_state.session_id,
-                    speaker=st.session_state.current_agent,
-                    message=user_input
-                )
-            
-            # Create event loop and run async function
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            responses = loop.run_until_complete(get_response())
-            loop.close()
-            
-            if responses:
-                for response in responses:
-                    agent_name = response.speaker.replace('_', ' ').title()
-
-                    # Add to message history
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "agent": agent_name,
-                        "content": response.text
-                    })
-
-                    # Display response
-                    st.markdown(f"""
-                    <div class="chat-message message-assistant">
-                        <strong>🤖 {agent_name}:</strong><br>{response.text}
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                    st.session_state.message_count += 1
-            else:
-                st.error("❌ No response received from the agent. Try again.")
-        
-        except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
-            st.info("💡 Check that your GOOGLE_API_KEY is set correctly.")
-    
-    st.rerun()
-
-# ============================================================================
-# DEBUG PANEL
-# ============================================================================
-
-with st.expander("🔧 Debug Panel", expanded=False):
-    # Basic info row
-    st.markdown("### 📊 Session Info")
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("User ID", st.session_state.user_id[-8:])
-    with col2:
-        st.metric("Session ID", st.session_state.session_id[-15:])
-    with col3:
-        st.metric("Messages", st.session_state.message_count)
-    with col4:
-        st.metric("API Key", "✅" if os.getenv("GOOGLE_API_KEY") else "❌")
-
-    # Engine status
-    st.markdown("### 🔧 Engine Status")
-    has_debug = hasattr(st.session_state.engine, 'get_debug_logs')
-    has_reset = hasattr(st.session_state.engine, 'reset_session')
-
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Debug Available", "✅" if has_debug else "❌")
-    with col2:
-        st.metric("Reset Available", "✅" if has_reset else "❌")
-    with col3:
-        if st.button("🔄 Force Refresh", use_container_width=True, help="Force reload the engine if it's outdated"):
-            # Clear the engine cache and reinitialize
-            get_simulation_engine.clear()
-            st.session_state.engine = get_simulation_engine(ENGINE_VERSION)
-            st.success("Engine refreshed! Refreshing page...")
-            st.rerun()
-
-    if not has_debug or not has_reset:
-        st.warning("⚠️ Engine may be outdated. Use the 'Force Refresh' button or clear cache.")
-        st.info("**Alternative:** Click hamburger menu (☰) → 'Clear cache' → 'Rerun'")
-    
-    st.divider()
-    
-    # Debug logs section
-    st.markdown("### 📋 Engine Debug Logs")
-    
-    col1, col2 = st.columns([0.7, 0.3])
-    with col1:
-        log_limit = st.slider("Show last N logs", min_value=5, max_value=50, value=15)
-    with col2:
-        if st.button("🗑️ Clear Logs"):
-            st.session_state.engine.clear_debug_logs()
-            st.success("Logs cleared!")
-    
-    # Get and display logs
-    try:
-        if not hasattr(st.session_state.engine, 'get_debug_logs'):
-            st.error("⚠️ Debug panel not available. Please refresh the page to update the engine.")
-            st.info("**To fix:** Click the hamburger menu (☰) → 'Clear cache' → 'Rerun'")
-            logs = []
-        else:
-            logs = st.session_state.engine.get_debug_logs(limit=log_limit)
-        
-        if logs:
-            for log in reversed(logs):  # Most recent first
-                # Color code by level
-                level_colors = {
-                    'info': '🔵',
-                    'warning': '🟡', 
-                    'error': '🔴'
-                }
-                level_icon = level_colors.get(log['level'], '⚪')
-                
-                # Format timestamp
-                timestamp = log['timestamp'].split('T')[1].split('.')[0] if 'T' in log['timestamp'] else log['timestamp']
-                
-                # Create expandable log entry
-                with st.container():
-                    st.markdown(f"**{level_icon} [{timestamp}] {log['message']}**")
-                    
-                    if log['details']:
-                        with st.expander("Details", expanded=log['level'] == 'error'):
-                            for key, value in log['details'].items():
-                                if key == 'traceback':
-                                    st.code(value, language='python')
-                                elif isinstance(value, list):
-                                    st.write(f"**{key}:** {', '.join(str(v) for v in value)}")
-                                else:
-                                    st.write(f"**{key}:** {value}")
-                    
-                    st.markdown("---")
-        else:
-            st.info("No debug logs yet. Send a message to generate logs.")
-    except Exception as e:
-        st.error(f"Error loading logs: {e}")
-    
-    st.divider()
-    
-    # Last response metadata
-    st.markdown("### 📨 Last Response Details")
-    if st.session_state.messages:
-        last_msg = st.session_state.messages[-1]
-        if last_msg.get('role') == 'assistant':
-            st.json({
-                "agent": last_msg.get('agent', 'unknown'),
-                "content_length": len(last_msg.get('content', '')),
-                "content_preview": last_msg.get('content', '')[:200] + '...' if len(last_msg.get('content', '')) > 200 else last_msg.get('content', '')
-            })
-        else:
-            st.info("Last message was from user, not an agent.")
-    else:
-        st.info("No messages yet.")
-    
-    st.divider()
-    
-    # Conversation history (for Sarai's all-knowing view)
-    st.markdown("### 🗂️ Conversation History (All Sessions)")
-    try:
-        history = st.session_state.engine.conversation_history
-        if history:
-            for session_key, messages in history.items():
-                with st.expander(f"Session: {session_key} ({len(messages)} messages)"):
-                    for msg in messages[-5:]:  # Show last 5 per session
-                        role_icon = "👤" if msg['role'] == 'user' else "🤖"
-                        st.markdown(f"{role_icon} **{msg['speaker']}**: {msg['message'][:100]}...")
-        else:
-            st.info("No conversation history recorded yet.")
-    except Exception as e:
-        st.error(f"Error loading history: {e}")
-
+if (
+    st.session_state.show_character_modal
+    and st.session_state.show_character_modal_source == "welcome"
+):
+    show_character_modal(st.session_state.show_character_modal)
