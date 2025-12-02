@@ -112,7 +112,7 @@ def render_top_nav(active: str):
                 )
             else:
                 if st.button("🎮 Simulation", width='stretch'):
-                    st.switch_page("pages/simulation.py")
+                    st.switch_page("simulation")
 
 
 def render_character_grid(characters):
@@ -154,7 +154,7 @@ if st.button(
 ):
     st.session_state.show_character_modal = None
     st.session_state.show_character_modal_source = None
-    st.switch_page("pages/simulation.py")
+    st.switch_page("simulation")
 if not has_met_character:
     st.caption("Meet a character first to unlock the simulation.")
 
