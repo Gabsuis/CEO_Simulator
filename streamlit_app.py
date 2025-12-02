@@ -104,12 +104,15 @@ def render_top_nav(active: str):
                 if st.button("🏠 Welcome", use_container_width=True):
                     st.switch_page("streamlit_app.py")
         with col2:
-            st.page_link(
-                "pages/simulation.py",
-                label="🎮 Simulation",
-                icon="💬",
-                disabled=active == "simulation",
-            )
+            if active == "simulation":
+                st.button(
+                    "🎮 Simulation",
+                    disabled=True,
+                    use_container_width=True,
+                )
+            else:
+                if st.button("🎮 Simulation", use_container_width=True):
+                    st.switch_page("pages/simulation.py")
 
 
 def render_character_grid(characters):
