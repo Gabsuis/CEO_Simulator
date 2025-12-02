@@ -2,6 +2,7 @@
 
 import asyncio
 import os
+from datetime import datetime
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -16,6 +17,13 @@ from app_styles import BASE_CSS
 from character_utils import (
     get_character_avatar,
     normalize_character_key,
+)
+from supabase_client import (
+    is_supabase_configured,
+    save_game_session,
+    list_user_sessions,
+    load_game_session,
+    logout,
 )
 
 st.set_page_config(
@@ -47,9 +55,112 @@ def render_top_nav():
             )
 
 
+def auto_save_session():
+    """Auto-save the current session to Supabase (if authenticated)."""
+    if not st.session_state.authenticated or not st.session_state.user:
+        return
+    
+    if not st.session_state.messages:
+        return  # Nothing to save
+    
+    # Create session name if not exists
+    if not st.session_state.session_name:
+        st.session_state.session_name = f"Game {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+    
+    # Save to Supabase
+    save_game_session(
+        user_id=st.session_state.user["id"],
+        session_name=st.session_state.session_name,
+        messages=st.session_state.messages,
+        current_agent=st.session_state.current_agent,
+        selected_characters=st.session_state.selected_characters
+    )
+
+
 def render_sidebar_controls():
     with st.sidebar:
+        # ─────────────────────────────────────────────────────────────
+        # USER & SESSION INFO
+        # ─────────────────────────────────────────────────────────────
+        if st.session_state.authenticated and st.session_state.user:
+            st.markdown(f"👤 **{st.session_state.user['email']}**")
+            if st.session_state.session_name:
+                st.caption(f"📁 {st.session_state.session_name}")
+            
+            # Session management
+            with st.expander("📂 Sessions", expanded=False):
+                # New session button
+                if st.button("🆕 New Game", use_container_width=True):
+                    # Save current first
+                    auto_save_session()
+                    # Reset for new game
+                    st.session_state.messages = []
+                    st.session_state.message_count = 0
+                    st.session_state.session_name = None
+                    st.session_state.current_game_session_id = None
+                    st.session_state.selected_characters = set()
+                    st.rerun()
+                
+                # Load previous sessions
+                sessions = list_user_sessions(st.session_state.user["id"])
+                if sessions:
+                    st.markdown("**Previous Games:**")
+                    for session in sessions[:5]:
+                        if st.button(
+                            f"📄 {session['session_name'][:20]}... ({session['message_count']} msgs)",
+                            key=f"load_{session['id']}",
+                            use_container_width=True
+                        ):
+                            session_data = load_game_session(session['id'])
+                            if session_data:
+                                st.session_state.messages = session_data["messages"]
+                                st.session_state.current_agent = session_data["current_agent"]
+                                st.session_state.selected_characters = session_data["selected_characters"]
+                                st.session_state.session_name = session_data["session_name"]
+                                st.session_state.current_game_session_id = session['id']
+                                st.session_state.message_count = len(session_data["messages"])
+                                st.success(f"✅ Loaded!")
+                                st.rerun()
+            
+            if st.button("🚪 Logout", use_container_width=True):
+                auto_save_session()  # Save before logout
+                logout()
+                st.switch_page("streamlit_app.py")
+            
+            st.markdown("---")
+        
+        # ─────────────────────────────────────────────────────────────
+        # CHARACTER CONTROLS
+        # ─────────────────────────────────────────────────────────────
         st.markdown("### 🎮 Simulation Controls")
+        
+        # Quick switch buttons FIRST (before selectbox to avoid state conflicts)
+        st.markdown("**⚡ Quick Switches**")
+        quick_chars = ["sarai", "tech_cofounder", "advisor", "vc"]
+        for char in quick_chars:
+            label = char.replace("_", " ").title()
+            is_current = st.session_state.current_agent == char
+            if st.button(
+                f"{'✓ ' if is_current else '→ '}{label}",
+                key=f"sim_quick_{char}",
+                width='stretch',
+                disabled=is_current,
+            ):
+                st.session_state.previous_agent = st.session_state.current_agent
+                st.session_state.current_agent = char
+                st.session_state.selected_characters.add(char)
+                # Add system notification for character switch
+                char_display = char.replace('_', ' ').title()
+                st.session_state.messages.append({
+                    "role": "system",
+                    "content": f"🔄 Switched to {char_display}"
+                })
+                st.session_state.message_count += 1
+                st.rerun()
+        
+        st.markdown("---")
+        
+        # Full character dropdown
         agents = [a["name"] for a in st.session_state.engine.list_agents()]
         agent_display = []
         agent_map = {}
@@ -71,37 +182,31 @@ def render_sidebar_controls():
         except ValueError:
             idx = 0
 
-        selected_display = st.selectbox(
-            "Select Character", agent_display, index=idx, key="simulation_agent_select"
-        )
-        st.session_state.current_agent = agent_map.get(
-            selected_display, st.session_state.current_agent
+        def on_agent_change():
+            """Handle agent selection change."""
+            selected = st.session_state.agent_selector
+            new_agent = agent_map.get(selected)
+            if new_agent and new_agent != st.session_state.current_agent:
+                st.session_state.previous_agent = st.session_state.current_agent
+                st.session_state.current_agent = new_agent
+                st.session_state.selected_characters.add(new_agent)
+                char_display = new_agent.replace('_', ' ').title()
+                st.session_state.messages.append({
+                    "role": "system",
+                    "content": f"🔄 Switched to {char_display}"
+                })
+                st.session_state.message_count += 1
+
+        st.selectbox(
+            "All Characters", 
+            agent_display, 
+            index=idx, 
+            key="agent_selector",
+            on_change=on_agent_change
         )
 
         if st.session_state.current_agent not in st.session_state.selected_characters:
             st.session_state.selected_characters.add(st.session_state.current_agent)
-
-        st.markdown("**⚡ Quick Switches**")
-        quick_chars = ["sarai", "tech_cofounder", "advisor", "vc"]
-        for char in quick_chars:
-            label = char.replace("_", " ").title()
-            if st.button(
-                f"→ {label}",
-                key=f"sim_quick_{char}",
-                width='stretch',
-            ):
-                if st.session_state.current_agent != char:
-                    st.session_state.previous_agent = st.session_state.current_agent
-                    st.session_state.current_agent = char
-                    st.session_state.selected_characters.add(char)
-                    # Add system notification for character switch
-                    char_display = char.replace('_', ' ').title()
-                    st.session_state.messages.append({
-                        "role": "system",
-                        "content": f"🔄 Switched to {char_display}"
-                    })
-                    st.session_state.message_count += 1
-                st.rerun()
 
         st.markdown("---")
         AGENT_INFO = {
@@ -267,6 +372,10 @@ def handle_chat_input():
                     {"role": "assistant", "agent": agent_name, "content": response.text}
                 )
                 st.session_state.message_count += 1
+            
+            # Auto-save after each exchange
+            auto_save_session()
+            
         except Exception as exc:
             st.error(f"❌ Error: {exc}")
             st.info("💡 Check that your GOOGLE_API_KEY is set correctly.")

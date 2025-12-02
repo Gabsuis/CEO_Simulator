@@ -27,6 +27,25 @@ def get_simulation_engine(_version: str):
 
 def initialize_session_state():
     """Ensure all session state defaults exist."""
+    
+    # ─────────────────────────────────────────────────────────────
+    # AUTH STATE (Supabase)
+    # ─────────────────────────────────────────────────────────────
+    if "user" not in st.session_state:
+        st.session_state.user = None
+    
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+    
+    if "current_game_session_id" not in st.session_state:
+        st.session_state.current_game_session_id = None
+    
+    if "session_name" not in st.session_state:
+        st.session_state.session_name = None
+    
+    # ─────────────────────────────────────────────────────────────
+    # ENGINE STATE
+    # ─────────────────────────────────────────────────────────────
     if "engine" not in st.session_state:
         st.session_state.engine = get_simulation_engine(ENGINE_VERSION)
 

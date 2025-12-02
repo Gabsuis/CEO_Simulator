@@ -15,6 +15,14 @@ from character_utils import (
     get_character_image_path,
     normalize_character_key,
 )
+from supabase_client import (
+    is_supabase_configured,
+    login,
+    signup,
+    logout,
+    list_user_sessions,
+    load_game_session,
+)
 
 st.set_page_config(
     page_title="CEO Simulator",
@@ -27,6 +35,91 @@ st.set_page_config(
 initialize_session_state()
 ensure_api_key()
 
+# ─────────────────────────────────────────────────────────────
+# AUTHENTICATION (only if Supabase is configured)
+# ─────────────────────────────────────────────────────────────
+supabase_enabled = is_supabase_configured()
+
+if supabase_enabled and not st.session_state.authenticated:
+    st.markdown(BASE_CSS, unsafe_allow_html=True)
+    
+    # Hide sidebar on login page
+    st.markdown(
+        """
+        <style>
+            [data-testid="stSidebar"] {display: none;}
+            [data-testid="collapsedControl"] {display: none;}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    
+    st.markdown(
+        """
+        <div style="max-width: 400px; margin: 0 auto; padding-top: 50px;">
+            <h1 style="text-align: center;">🎮 CEO Simulator</h1>
+            <p style="text-align: center; color: #666;">Sign in to save your progress</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        tab1, tab2 = st.tabs(["🔑 Login", "✨ Sign Up"])
+        
+        with tab1:
+            with st.form("login_form"):
+                email = st.text_input("Email", placeholder="you@example.com")
+                password = st.text_input("Password", type="password")
+                
+                if st.form_submit_button("Login", use_container_width=True):
+                    if email and password:
+                        user = login(email, password)
+                        if user:
+                            st.session_state.user = user
+                            st.session_state.authenticated = True
+                            # Clear any previous game state to prevent session bleeding
+                            st.session_state.messages = []
+                            st.session_state.message_count = 0
+                            st.session_state.session_name = None
+                            st.session_state.current_game_session_id = None
+                            st.session_state.selected_characters = set()
+                            st.success("✅ Welcome back!")
+                            st.rerun()
+                    else:
+                        st.warning("Please enter email and password")
+        
+        with tab2:
+            with st.form("signup_form"):
+                email = st.text_input("Email", placeholder="you@example.com", key="signup_email")
+                password = st.text_input("Password", type="password", key="signup_pass", 
+                                        help="Minimum 6 characters")
+                password_confirm = st.text_input("Confirm Password", type="password", key="signup_pass_confirm")
+                
+                if st.form_submit_button("Create Account", use_container_width=True):
+                    if not email or not password:
+                        st.warning("Please fill in all fields")
+                    elif password != password_confirm:
+                        st.error("Passwords don't match")
+                    elif len(password) < 6:
+                        st.error("Password must be at least 6 characters")
+                    else:
+                        if signup(email, password):
+                            st.success("✅ Account created! Please login.")
+        
+        st.markdown("---")
+        st.caption("Or continue without an account (progress won't be saved)")
+        if st.button("🎮 Play as Guest", use_container_width=True):
+            st.session_state.authenticated = False
+            st.session_state.user = None
+            st.rerun()
+    
+    st.stop()
+
+# ─────────────────────────────────────────────────────────────
+# MAIN APP (authenticated or guest mode)
+# ─────────────────────────────────────────────────────────────
 st.markdown(BASE_CSS, unsafe_allow_html=True)
 st.markdown(
     """
@@ -134,6 +227,41 @@ def render_character_grid(characters):
 
 
 render_top_nav("welcome")
+
+# ─────────────────────────────────────────────────────────────
+# USER INFO BAR (if authenticated)
+# ─────────────────────────────────────────────────────────────
+if st.session_state.authenticated and st.session_state.user:
+    user_col1, user_col2 = st.columns([3, 1])
+    with user_col1:
+        st.markdown(f"👤 Logged in as **{st.session_state.user['email']}**")
+    with user_col2:
+        if st.button("🚪 Logout", use_container_width=True):
+            logout()
+            st.rerun()
+    
+    # Show saved sessions
+    sessions = list_user_sessions(st.session_state.user["id"])
+    if sessions:
+        with st.expander("📂 **Continue a Previous Game**", expanded=False):
+            for session in sessions[:5]:  # Show last 5
+                col1, col2, col3 = st.columns([3, 1, 1])
+                with col1:
+                    st.markdown(f"**{session['session_name']}**")
+                    st.caption(f"{session['message_count']} messages • {session['current_agent'].replace('_', ' ').title()}")
+                with col2:
+                    if st.button("▶️ Resume", key=f"resume_{session['id']}", use_container_width=True):
+                        # Load the session
+                        session_data = load_game_session(session['id'])
+                        if session_data:
+                            st.session_state.messages = session_data["messages"]
+                            st.session_state.current_agent = session_data["current_agent"]
+                            st.session_state.selected_characters = session_data["selected_characters"]
+                            st.session_state.session_name = session_data["session_name"]
+                            st.session_state.current_game_session_id = session['id']
+                            st.session_state.message_count = len(session_data["messages"])
+                            st.switch_page("pages/simulation.py")
+    st.markdown("---")
 
 st.markdown("<div class='welcome-body'>", unsafe_allow_html=True)
 st.markdown("## 🎮 Welcome to CEO Simulator")
