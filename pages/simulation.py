@@ -37,13 +37,13 @@ def render_top_nav():
     with st.container():
         col1, col2 = st.columns([1, 1])
         with col1:
-            if st.button("🏠 Welcome", use_container_width=True):
+            if st.button("🏠 Welcome", width='stretch'):
                 st.switch_page("streamlit_app.py")
         with col2:
             st.button(
                 "🎮 Simulation",
                 disabled=True,
-                use_container_width=True,
+                width='stretch',
             )
 
 
@@ -88,7 +88,7 @@ def render_sidebar_controls():
             if st.button(
                 f"→ {label}",
                 key=f"sim_quick_{char}",
-                use_container_width=True,
+                width='stretch',
             ):
                 if st.session_state.current_agent != char:
                     st.session_state.previous_agent = st.session_state.current_agent
@@ -118,7 +118,7 @@ def render_sidebar_controls():
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔄 Clear Chat", use_container_width=True):
+            if st.button("🔄 Clear Chat", width='stretch'):
                 st.session_state.engine.reset_session(
                     user_id=st.session_state.user_id,
                     session_id=st.session_state.session_id,
@@ -149,10 +149,10 @@ def render_sidebar_controls():
                     data=transcript_text,
                     file_name="ceo_sim_transcript.txt",
                     mime="text/plain",
-                    use_container_width=True,
+                    width='stretch',
                 )
             else:
-                st.button("📥 Export", use_container_width=True, disabled=True)
+                st.button("📥 Export", width='stretch', disabled=True)
 
 
 def render_floating_dashboard():
@@ -293,7 +293,7 @@ def render_debug_panel():
         with col2:
             st.metric("Reset Available", "✅" if has_reset else "❌")
         with col3:
-            if st.button("🔄 Force Refresh", use_container_width=True):
+            if st.button("🔄 Force Refresh", width='stretch'):
                 get_simulation_engine.clear()
                 st.session_state.engine = get_simulation_engine(ENGINE_VERSION)
                 st.success("Engine refreshed! Refreshing page...")

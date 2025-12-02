@@ -98,21 +98,21 @@ def render_top_nav(active: str):
                 st.button(
                     "🏠 Welcome",
                     disabled=True,
-                    use_container_width=True,
+                    width='stretch',
                 )
             else:
-                if st.button("🏠 Welcome", use_container_width=True):
+                if st.button("🏠 Welcome", width='stretch'):
                     st.switch_page("streamlit_app.py")
         with col2:
             if active == "simulation":
                 st.button(
                     "🎮 Simulation",
                     disabled=True,
-                    use_container_width=True,
+                    width='stretch',
                 )
             else:
-                if st.button("🎮 Simulation", use_container_width=True):
-                    st.switch_page("pages/simulation.py")
+                if st.button("🎮 Simulation", width='stretch'):
+                    st.switch_page("simulation")
 
 
 def render_character_grid(characters):
@@ -126,7 +126,7 @@ def render_character_grid(characters):
             if st.button(
                 f"Meet {char['name']}",
                 key=f"meet_{char['id']}",
-                use_container_width=True,
+                width='stretch',
             ):
                 st.session_state.show_character_modal = char["id"]
                 st.session_state.show_character_modal_source = "welcome"
@@ -149,7 +149,7 @@ st.write(
 if st.button(
     "Start Simulation",
     type="primary",
-    use_container_width=True,
+    width='stretch',
     disabled=not has_met_character,
 ):
     st.session_state.show_character_modal = None
